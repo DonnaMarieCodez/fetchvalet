@@ -12,6 +12,59 @@ function pad(value: number) {
   return String(value).padStart(2, "0");
 }
 
+export async function createInvoice(formData: FormData) {
+  const propertyId = String(formData.get("propertyId") || "").trim();
+  const dueDate = String(formData.get("dueDate") || "").trim();
+  const notes = String(formData.get("notes") || "").trim();
+
+  if (!propertyId || !dueDate) {
+    throw new Error("Property and due date are required.");
+  }
+
+  const supabase = await createClient();
+  const issueDate = new Date().toISOString().slice(0, 10);
+
+  const { data: property, error: propertyError } = await supabase
+    .from("properties")
+    .select("id, name, monthly_billing_cents, property_status")
+    .eq("id", propertyId)
+    .single();
+
+  if (propertyError || !property) {
+    throw new Error(propertyError?.message || "Property not found.");
+  }
+
+  if (String(property.property_status || "").toLowerCase() === "suspended") {
+    throw new Error("Cannot create an invoice for a suspended property.");
+  }
+
+  const monthlyBillingAmount = Number(property.monthly_billing_cents || 0);
+  const invoiceNumber = `INV-${Date.now()}-${property.id
+    .slice(0, 6)
+    .toUpperCase()}`;
+
+  const { error: invoiceError } = await supabase.from("invoices").insert({
+    property_id: property.id,
+    invoice_number: invoiceNumber,
+    issue_date: issueDate,
+    due_date: dueDate,
+    status: "draft",
+    amount_cents: monthlyBillingAmount,
+    subtotal_cents: monthlyBillingAmount,
+    adjustments_cents: 0,
+    tax_cents: 0,
+    total_cents: monthlyBillingAmount,
+    notes: notes || null,
+  });
+
+  if (invoiceError) {
+    throw new Error(invoiceError.message);
+  }
+
+  revalidatePath("/admin/invoices");
+  revalidatePath("/admin/accounting");
+}
+
 export async function bulkGenerateMonthlyInvoices(formData: FormData) {
   const billingMonth = String(formData.get("billingMonth") || "").trim();
   const dueDate = String(formData.get("dueDate") || "").trim();
@@ -245,3 +298,5 @@ export async function deleteInvoice(formData: FormData) {
   revalidatePath("/admin/invoices");
   revalidatePath("/admin/accounting");
 }
+
+export { bulkGenerateMonthlyInvoices as bulkGenerateInvoices };

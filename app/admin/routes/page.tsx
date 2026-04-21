@@ -11,10 +11,10 @@ type PropertyRecord = {
 
 type RouteRecord = {
   id: string;
-  route_date: string;
+  route_date: string | null;
   start_time: string | null;
   end_time: string | null;
-  status: string;
+  status: string | null;
   payout_cents: number | null;
   minimum_worker_score: number | null;
   properties: {
@@ -30,12 +30,8 @@ function formatTime(value: string | null) {
   if (!value) return "Not set";
 
   const raw = String(value).trim();
-
   if (!raw) return "Not set";
-
-  if (raw.includes("AM") || raw.includes("PM")) {
-    return raw;
-  }
+  if (raw.includes("AM") || raw.includes("PM")) return raw;
 
   const [hourString, minuteString = "00"] = raw.split(":");
   const hour = Number(hourString);
@@ -49,8 +45,8 @@ function formatTime(value: string | null) {
   return `${hour12}:${minute} ${suffix}`;
 }
 
-function getStatusBadge(status: string) {
-  switch (status) {
+function getStatusBadge(status: string | null) {
+  switch ((status || "").toLowerCase()) {
     case "open":
       return "bg-blue-50 text-blue-700 border-blue-200";
     case "claimed":
@@ -62,6 +58,34 @@ function getStatusBadge(status: string) {
     default:
       return "bg-slate-50 text-slate-700 border-slate-200";
   }
+}
+
+function normalizeProperty(value: unknown): { name: string } | null {
+  if (!value) return null;
+
+  if (Array.isArray(value)) {
+    const first = value[0];
+    if (
+      first &&
+      typeof first === "object" &&
+      "name" in first &&
+      typeof (first as { name?: unknown }).name === "string"
+    ) {
+      return { name: (first as { name: string }).name };
+    }
+    return null;
+  }
+
+  if (
+    typeof value === "object" &&
+    value !== null &&
+    "name" in value &&
+    typeof (value as { name?: unknown }).name === "string"
+  ) {
+    return { name: (value as { name: string }).name };
+  }
+
+  return null;
 }
 
 export default async function AdminRoutesPage() {
@@ -93,8 +117,35 @@ export default async function AdminRoutesPage() {
       .order("route_date", { ascending: false }),
   ]);
 
-  const typedProperties = (properties ?? []) as PropertyRecord[];
-  const typedRoutes = (routes ?? []) as RouteRecord[];
+  const typedProperties: PropertyRecord[] = (properties ?? []).map((row) => {
+    const record = row as Record<string, unknown>;
+
+    return {
+      id: String(record.id ?? ""),
+      name: typeof record.name === "string" ? record.name : "Unknown Property",
+    };
+  });
+
+  const typedRoutes: RouteRecord[] = (routes ?? []).map((row) => {
+    const record = row as Record<string, unknown>;
+
+    return {
+      id: String(record.id ?? ""),
+      route_date:
+        typeof record.route_date === "string" ? record.route_date : null,
+      start_time:
+        typeof record.start_time === "string" ? record.start_time : null,
+      end_time: typeof record.end_time === "string" ? record.end_time : null,
+      status: typeof record.status === "string" ? record.status : null,
+      payout_cents:
+        typeof record.payout_cents === "number" ? record.payout_cents : 0,
+      minimum_worker_score:
+        typeof record.minimum_worker_score === "number"
+          ? record.minimum_worker_score
+          : 0,
+      properties: normalizeProperty(record.properties),
+    };
+  });
 
   return (
     <main className="min-h-screen bg-slate-100 p-8">
@@ -225,16 +276,14 @@ export default async function AdminRoutesPage() {
             <h2 className="text-2xl font-bold text-slate-900">Auto Generate</h2>
             <p className="mt-2 text-sm text-slate-500">
               Generate scheduled routes for active properties with auto-generate
-              enabled. After the cutoff time, the generator builds routes for the
-              next service day.
+              enabled.
             </p>
 
             <AutoGenerateForm />
 
             <div className="mt-4 rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">
-              Auto-generation only runs for active properties with auto-generate
-              enabled, matching service days, and no existing routes for the target
-              date.
+              Auto-generation only runs for active properties with matching
+              service days and no existing route for the target date.
             </div>
           </section>
         </div>
@@ -262,7 +311,7 @@ export default async function AdminRoutesPage() {
                         {route.properties?.name || "Unknown Property"}
                       </p>
                       <p className="mt-2 text-sm text-slate-600">
-                        Date: {route.route_date}
+                        Date: {route.route_date || "Not set"}
                       </p>
                       <p className="mt-1 text-sm text-slate-600">
                         Time: {formatTime(route.start_time)} -{" "}
@@ -279,7 +328,7 @@ export default async function AdminRoutesPage() {
                           route.status
                         )}`}
                       >
-                        {route.status.replaceAll("_", " ")}
+                        {(route.status || "unknown").replaceAll("_", " ")}
                       </span>
 
                       <p className="text-2xl font-bold text-slate-900">

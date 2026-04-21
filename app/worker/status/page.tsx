@@ -4,7 +4,7 @@ import { getWorkerProfile } from "../../../src/lib/auth/get-worker-profile";
 export default async function WorkerStatusPage() {
   const { profile } = await getWorkerProfile();
 
-  const status = profile?.worker_status || "pending";
+  const status = profile?.status || "pending";
 
   let title = "Application Received";
   let message =
@@ -12,41 +12,37 @@ export default async function WorkerStatusPage() {
 
   if (status === "approved") {
     title = "Account Approved";
-    message = "Your worker account has been approved. You can now access routes.";
+    message =
+      "Your worker account is approved. You can now access routes and begin working.";
   }
 
   if (status === "rejected") {
-    title = "Application Rejected";
-    message = "Your worker account was not approved. Contact admin for more information.";
+    title = "Application Update";
+    message =
+      "Your worker application was not approved. Please contact support for more information.";
   }
 
   if (status === "suspended") {
     title = "Account Suspended";
-    message = "Your worker account is currently suspended. Contact admin for assistance.";
+    message =
+      "Your worker account is currently suspended. You cannot access routes at this time.";
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 p-8">
-      <div className="mx-auto max-w-xl rounded-2xl border bg-white p-6 shadow-sm">
-        <h1 className="text-3xl font-bold text-slate-900">{title}</h1>
-        <p className="mt-3 text-slate-600">{message}</p>
+    <main className="min-h-screen bg-slate-100 p-8">
+      <div className="mx-auto max-w-3xl">
+        <div className="rounded-3xl border border-slate-200 bg-white p-10 shadow-sm">
+          <h1 className="text-4xl font-bold text-slate-900">{title}</h1>
+          <p className="mt-4 text-lg text-slate-600">{message}</p>
 
-        <div className="mt-6 flex gap-3">
-          <Link
-            href="/login"
-            className="inline-block rounded-xl bg-slate-900 px-4 py-2 text-white"
-          >
-            Go to Login
-          </Link>
-
-          {status === "approved" && (
+          <div className="mt-8">
             <Link
               href="/worker"
-              className="inline-block rounded-xl border px-4 py-2"
+              className="inline-flex rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
             >
               Go to Dashboard
             </Link>
-          )}
+          </div>
         </div>
       </div>
     </main>
