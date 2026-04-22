@@ -1,60 +1,40 @@
 "use server";
 
-import { createClient } from "../../../src/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { createClient } from "../../../src/lib/supabase/server";
 
-export async function approveWorker(formData: FormData) {
-  const workerId = formData.get("workerId") as string;
-  if (!workerId) return;
-
+async function updateWorkerStatus(workerId: string, nextStatus: string) {
   const supabase = await createClient();
+
+  if (!workerId) {
+    throw new Error("Worker ID is required.");
+  }
 
   const { error } = await supabase
     .from("profiles")
-    .update({ worker_status: "approved" })
-    .eq("id", workerId);
+    .update({ status: nextStatus })
+    .eq("id", workerId)
+    .eq("role", "worker");
 
   if (error) {
     throw new Error(error.message);
   }
 
   revalidatePath("/admin/workers");
-  revalidatePath("/worker/status");
-  revalidatePath("/worker");
+  revalidatePath(`/admin/workers/${workerId}`);
+}
+
+export async function approveWorker(formData: FormData) {
+  const workerId = String(formData.get("workerId") || "");
+  await updateWorkerStatus(workerId, "approved");
 }
 
 export async function rejectWorker(formData: FormData) {
-  const workerId = formData.get("workerId") as string;
-  if (!workerId) return;
-
-  const supabase = await createClient();
-
-  const { error } = await supabase
-    .from("profiles")
-    .update({ worker_status: "rejected" })
-    .eq("id", workerId);
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  revalidatePath("/admin/workers");
+  const workerId = String(formData.get("workerId") || "");
+  await updateWorkerStatus(workerId, "rejected");
 }
 
 export async function suspendWorker(formData: FormData) {
-  const workerId = formData.get("workerId") as string;
-  if (!workerId) return;
-
-  const supabase = await createClient();
-
-  const { error } = await supabase
-    .from("profiles")
-    .update({ worker_status: "suspended" })
-    .eq("id", workerId);
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  revalidatePath("/admin/workers");
+  const workerId = String(formData.get("workerId") || "");
+  await updateWorkerStatus(workerId, "suspended");
 }
