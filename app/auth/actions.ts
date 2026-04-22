@@ -89,6 +89,56 @@ export async function loginProperty(formData: FormData) {
   await signInAndRoute(email, password, "property", "/property");
 }
 
+export async function signUpWorker(formData: FormData) {
+  const supabase = await createClient();
+
+  const fullName = String(formData.get("fullName") || "").trim();
+  const email = String(formData.get("email") || "").trim().toLowerCase();
+  const phone = String(formData.get("phone") || "").trim();
+  const password = String(formData.get("password") || "").trim();
+
+  if (!fullName || !email || !password) {
+    throw new Error("Full name, email, and password are required.");
+  }
+
+  const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        full_name: fullName,
+        role: "worker",
+      },
+    },
+  });
+
+  if (signUpError) {
+    throw new Error(signUpError.message);
+  }
+
+  const userId = signUpData.user?.id;
+
+  if (!userId) {
+    redirect("/worker/status");
+  }
+
+  const { error: profileError } = await supabase.from("profiles").upsert({
+    id: userId,
+    full_name: fullName,
+    email,
+    phone: phone || null,
+    role: "worker",
+    status: "pending",
+    worker_score: 75,
+  });
+
+  if (profileError) {
+    throw new Error(profileError.message);
+  }
+
+  redirect("/worker/status");
+}
+
 export async function logout() {
   const supabase = await createClient();
   await supabase.auth.signOut();
