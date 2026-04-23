@@ -47,7 +47,7 @@ export default function WorkerLoginPage() {
               </Link>
 
               <Link
-                href="/signup/worker"
+                href="/worker/onboarding"
                 className="rounded-2xl px-5 py-3 text-sm font-semibold text-blue-600 transition hover:text-blue-700"
               >
                 Need an account?

@@ -39,14 +39,13 @@ export default function HomePage() {
             <h2 className="mt-4 text-5xl font-bold leading-tight text-slate-900">
               Book reliable trash
               <br />
-              pickup{" "}
-              <span className="text-blue-600">without the hassle</span>
+              pickup <span className="text-blue-600">without the hassle</span>
             </h2>
 
             <p className="mt-6 text-lg text-slate-600">
               FetchValet connects properties with vetted workers to handle
-              nightly trash collection—no hiring, no scheduling headaches, no
-              missed pickups.
+              nightly trash collection—no hiring, no scheduling headaches, and
+              no missed pickups.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-4">
@@ -58,7 +57,7 @@ export default function HomePage() {
               </Link>
 
               <Link
-                href="/signup/worker"
+                href="/worker/onboarding"
                 className="rounded-xl border border-slate-300 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
               >
                 Become a Worker
@@ -121,7 +120,7 @@ export default function HomePage() {
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-6 text-center">
-              <h3 className="text-lg font-semibold">2. Routes get claimed</h3>
+              <h3 className="text-lg font-semibold">2. Jobs get claimed</h3>
               <p className="mt-2 text-sm text-slate-600">
                 Workers nearby accept and complete jobs.
               </p>
@@ -138,7 +137,7 @@ export default function HomePage() {
       </section>
 
       <section className="bg-slate-900 py-16 text-white">
-        <div className="mx-auto grid max-w-6xl gap-8 px-8 md:grid-cols-3">
+        <div className="mx-auto grid max-w-6xl gap-8 px-8 md:grid-cols-2">
           <div>
             <h3 className="text-lg font-semibold">For Properties</h3>
             <p className="mt-2 text-sm text-slate-300">
@@ -150,13 +149,6 @@ export default function HomePage() {
             <h3 className="text-lg font-semibold">For Workers</h3>
             <p className="mt-2 text-sm text-slate-300">
               Claim jobs, complete routes, and get paid fast.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold">For Admins</h3>
-            <p className="mt-2 text-sm text-slate-300">
-              Run operations, approvals, payouts, and performance tracking.
             </p>
           </div>
         </div>
@@ -176,7 +168,7 @@ export default function HomePage() {
           </Link>
 
           <Link
-            href="/signup/worker"
+            href="/worker/onboarding"
             className="rounded-xl border border-slate-300 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
           >
             Join as Worker
