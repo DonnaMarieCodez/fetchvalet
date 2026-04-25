@@ -2,177 +2,156 @@ import Link from "next/link";
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-8 py-4">
+    <main className="bg-black text-white">
+      {/* HERO */}
+      <section className="relative overflow-hidden">
+        <div className="mx-auto max-w-7xl px-6 py-20 grid md:grid-cols-2 gap-12 items-center">
+          
+          {/* LEFT SIDE */}
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">FetchValet</h1>
-            <p className="text-sm text-slate-500">
-              On-demand valet trash service
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Link
-              href="/property/login"
-              className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-            >
-              Property Login
-            </Link>
-            <Link
-              href="/worker/login"
-              className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
-            >
-              Worker Login
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <section className="mx-auto max-w-6xl px-8 py-16">
-        <div className="grid items-center gap-12 md:grid-cols-2">
-          <div>
-            <span className="inline-block rounded-full bg-blue-100 px-4 py-1 text-sm text-blue-600">
-              On-demand valet trash
-            </span>
-
-            <h2 className="mt-4 text-5xl font-bold leading-tight text-slate-900">
-              Book reliable trash
-              <br />
-              pickup <span className="text-blue-600">without the hassle</span>
-            </h2>
-
-            <p className="mt-6 text-lg text-slate-600">
-              FetchValet connects properties with vetted workers to handle
-              nightly trash collection—no hiring, no scheduling headaches, and
-              no missed pickups.
+            <p className="text-blue-500 text-sm uppercase tracking-widest">
+              On-Demand Valet Trash Service
             </p>
 
-            <div className="mt-8 flex flex-wrap gap-4">
+            <h1 className="mt-4 text-5xl md:text-6xl font-extrabold leading-tight">
+              A better way to <br />
+              <span className="text-blue-500">handle valet trash.</span>
+            </h1>
+
+            <p className="mt-6 text-lg text-slate-300 max-w-xl">
+              No hiring. No scheduling headaches. No missed pickups.  
+              FetchValet connects properties with reliable workers—on demand.
+            </p>
+
+            <div className="mt-8 flex gap-4">
               <Link
                 href="/property/onboarding"
-                className="rounded-xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+                className="rounded-xl bg-blue-600 px-6 py-3 font-semibold hover:bg-blue-500"
               >
                 Request Service
               </Link>
 
               <Link
-                href="/worker/onboarding"
-                className="rounded-xl border border-slate-300 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                href="/signup/worker"
+                className="rounded-xl border border-white px-6 py-3 font-semibold hover:bg-white hover:text-black"
               >
                 Become a Worker
               </Link>
             </div>
           </div>
 
-          <div className="grid gap-4">
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <h3 className="font-semibold text-slate-900">
-                Instant route assignment
-              </h3>
-              <p className="mt-2 text-sm text-slate-600">
-                Routes are automatically created and picked up by available
-                workers in your area.
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <h3 className="font-semibold text-slate-900">
-                Verified service with proof
-              </h3>
-              <p className="mt-2 text-sm text-slate-600">
-                Every pickup includes photo proof for full transparency.
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <h3 className="font-semibold text-slate-900">
-                Flexible workforce
-              </h3>
-              <p className="mt-2 text-sm text-slate-600">
-                No hiring needed. Workers claim jobs and complete routes on
-                demand.
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <h3 className="font-semibold text-slate-900">Simple billing</h3>
-              <p className="mt-2 text-sm text-slate-600">
-                Monthly invoices with built-in tracking and reporting.
-              </p>
+          {/* RIGHT SIDE IMAGE */}
+          <div className="hidden md:block">
+            <div className="rounded-3xl bg-gradient-to-br from-slate-900 to-slate-800 p-6 shadow-2xl">
+              <div className="h-[400px] w-full rounded-2xl bg-[url('/hero-trash.jpg')] bg-cover bg-center" />
             </div>
           </div>
         </div>
       </section>
 
-      <section className="bg-white py-16">
-        <div className="mx-auto max-w-6xl px-8">
-          <h2 className="text-center text-3xl font-bold text-slate-900">
-            How FetchValet Works
-          </h2>
-
-          <div className="mt-12 grid gap-8 md:grid-cols-3">
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 text-center">
-              <h3 className="text-lg font-semibold">1. Add your property</h3>
-              <p className="mt-2 text-sm text-slate-600">
-                Enter your units and service schedule.
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 text-center">
-              <h3 className="text-lg font-semibold">2. Jobs get claimed</h3>
-              <p className="mt-2 text-sm text-slate-600">
-                Workers nearby accept and complete jobs.
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 text-center">
-              <h3 className="text-lg font-semibold">3. Track everything</h3>
-              <p className="mt-2 text-sm text-slate-600">
-                Monitor service, proof photos, and payments in one place.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-slate-900 py-16 text-white">
-        <div className="mx-auto grid max-w-6xl gap-8 px-8 md:grid-cols-2">
+      {/* FEATURES */}
+      <section className="border-t border-slate-800">
+        <div className="mx-auto max-w-7xl px-6 py-16 grid md:grid-cols-4 gap-8 text-center">
+          
           <div>
-            <h3 className="text-lg font-semibold">For Properties</h3>
-            <p className="mt-2 text-sm text-slate-300">
-              Stay on top of service without managing staff.
+            <p className="text-blue-500 text-lg">●</p>
+            <h3 className="mt-3 font-semibold">Reliable Service</h3>
+            <p className="text-sm text-slate-400 mt-2">
+              You can count on every pickup.
             </p>
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold">For Workers</h3>
-            <p className="mt-2 text-sm text-slate-300">
-              Claim jobs, complete routes, and get paid fast.
+            <p className="text-blue-500 text-lg">●</p>
+            <h3 className="mt-3 font-semibold">On-Demand</h3>
+            <p className="text-sm text-slate-400 mt-2">
+              Service when you need it.
             </p>
+          </div>
+
+          <div>
+            <p className="text-blue-500 text-lg">●</p>
+            <h3 className="mt-3 font-semibold">Verified Pickups</h3>
+            <p className="text-sm text-slate-400 mt-2">
+              Proof photos every time.
+            </p>
+          </div>
+
+          <div>
+            <p className="text-blue-500 text-lg">●</p>
+            <h3 className="mt-3 font-semibold">Better Communities</h3>
+            <p className="text-sm text-slate-400 mt-2">
+              Cleaner properties daily.
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+      {/* HOW IT WORKS */}
+      <section className="bg-slate-950">
+        <div className="mx-auto max-w-7xl px-6 py-20 text-center">
+          <h2 className="text-3xl font-bold">How FetchValet Works</h2>
+
+          <div className="mt-12 grid md:grid-cols-3 gap-6">
+            
+            <div className="rounded-2xl bg-slate-900 p-6">
+              <h3 className="font-semibold">1. Add your property</h3>
+              <p className="text-sm text-slate-400 mt-2">
+                Set units and service days.
+              </p>
+            </div>
+
+            <div className="rounded-2xl bg-slate-900 p-6">
+              <h3 className="font-semibold">2. Routes get claimed</h3>
+              <p className="text-sm text-slate-400 mt-2">
+                Workers pick up jobs instantly.
+              </p>
+            </div>
+
+            <div className="rounded-2xl bg-slate-900 p-6">
+              <h3 className="font-semibold">3. Track everything</h3>
+              <p className="text-sm text-slate-400 mt-2">
+                Monitor service and payments.
+              </p>
+            </div>
+
           </div>
         </div>
       </section>
 
-      <section className="py-16 text-center">
-        <h2 className="text-3xl font-bold text-slate-900">
-          Ready to simplify your trash operations?
-        </h2>
+      {/* CTA SPLIT */}
+      <section className="bg-blue-600">
+        <div className="mx-auto max-w-7xl px-6 py-16 grid md:grid-cols-2 gap-8 items-center text-white">
+          
+          <div>
+            <h3 className="text-2xl font-bold">For Properties</h3>
+            <p className="mt-2 text-blue-100">
+              Simplify operations. No staffing headaches.
+            </p>
 
-        <div className="mt-6 flex justify-center gap-4">
-          <Link
-            href="/property/onboarding"
-            className="rounded-xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
-          >
-            Get Started
-          </Link>
+            <Link
+              href="/property/onboarding"
+              className="inline-block mt-4 rounded-xl bg-white text-blue-600 px-5 py-3 font-semibold"
+            >
+              Get Started
+            </Link>
+          </div>
 
-          <Link
-            href="/worker/onboarding"
-            className="rounded-xl border border-slate-300 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-          >
-            Join as Worker
-          </Link>
+          <div>
+            <h3 className="text-2xl font-bold">For Workers</h3>
+            <p className="mt-2 text-blue-100">
+              Flexible work. Get paid fast.
+            </p>
+
+            <Link
+              href="/signup/worker"
+              className="inline-block mt-4 rounded-xl border border-white px-5 py-3 font-semibold"
+            >
+              Join Now
+            </Link>
+          </div>
+
         </div>
       </section>
     </main>
