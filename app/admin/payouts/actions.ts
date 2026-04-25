@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "../../../src/lib/supabase/server";
-import { stripe } from "../../../src/lib/stripe";
+import { getStripe } from "../../../src/lib/stripe";
 
 export async function releaseWorkerPayout(formData: FormData) {
   const routeId = String(formData.get("routeId") || "");
@@ -12,6 +12,7 @@ export async function releaseWorkerPayout(formData: FormData) {
   }
 
   const supabase = await createClient();
+  const stripe = getStripe();
 
   const { data: route, error: routeError } = await supabase
     .from("routes")
@@ -58,6 +59,10 @@ export async function releaseWorkerPayout(formData: FormData) {
     ? route.profiles[0]
     : route.profiles;
 
+  const property = Array.isArray(route.properties)
+    ? route.properties[0]
+    : route.properties;
+
   if (!worker?.stripe_account_id) {
     throw new Error("Worker does not have a Stripe account connected.");
   }
@@ -65,10 +70,6 @@ export async function releaseWorkerPayout(formData: FormData) {
   if (!worker?.stripe_payouts_enabled) {
     throw new Error("Worker Stripe payouts are not enabled.");
   }
-
-  const property = Array.isArray(route.properties)
-    ? route.properties[0]
-    : route.properties;
 
   const transfer = await stripe.transfers.create({
     amount: payoutCents,
