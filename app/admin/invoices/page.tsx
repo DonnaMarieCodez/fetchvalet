@@ -4,6 +4,7 @@ import {
   deleteInvoice,
   updateInvoice,
 } from "./actions/invoice-actions";
+import { requireAdmin } from "../../../src/lib/auth/require-admin";
 import { createClient } from "../../../src/lib/supabase/server";
 import ConfirmDeleteInvoiceButton from "./ConfirmDeleteInvoiceButton";
 
