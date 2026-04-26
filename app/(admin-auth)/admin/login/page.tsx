@@ -1,21 +1,36 @@
 import Link from "next/link";
-import { loginAdmin } from "../../auth/actions";
+import { loginAdmin } from "../../../auth/actions";
 
-export default function AdminLoginPage() {
+type Props = {
+  searchParams?: Promise<{
+    error?: string;
+  }>;
+};
+
+export default async function AdminLoginPage({ searchParams }: Props) {
+  const params = await searchParams;
+  const error = params?.error;
+
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-950 p-6">
-      <div className="w-full max-w-md rounded-3xl border border-white/10 bg-white p-8 shadow-2xl">
-        <p className="text-sm font-semibold uppercase tracking-[0.25em] text-blue-600">
+    <main className="flex min-h-screen items-center justify-center bg-black p-6">
+      <section className="w-full max-w-md rounded-3xl bg-white p-8 shadow-2xl">
+        <p className="text-sm font-bold uppercase tracking-[0.25em] text-blue-600">
           Admin Login
         </p>
 
-        <h1 className="mt-3 text-3xl font-black text-slate-900">
+        <h1 className="mt-3 text-3xl font-black text-slate-950">
           Sign in to FetchValet
         </h1>
 
         <p className="mt-2 text-sm text-slate-600">
           Authorized administrators only.
         </p>
+
+        {error && (
+          <div className="mt-5 rounded-2xl bg-rose-50 p-4 text-sm font-semibold text-rose-700">
+            Invalid admin login. Please check your email and password.
+          </div>
+        )}
 
         <form action={loginAdmin} className="mt-8 space-y-5">
           <div>
@@ -60,7 +75,7 @@ export default function AdminLoginPage() {
         >
           Back to homepage
         </Link>
-      </div>
+      </section>
     </main>
   );
 }

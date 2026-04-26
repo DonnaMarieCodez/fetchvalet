@@ -24,8 +24,12 @@ async function signInAndRoute(
   });
 
   if (signInError) {
-    throw new Error(signInError.message);
+  if (expectedRole === "admin") {
+    redirect("/admin/login?error=invalid");
   }
+
+  throw new Error(signInError.message);
+}
 
   const {
     data: { user },
@@ -47,9 +51,14 @@ async function signInAndRoute(
   }
 
   if (profile.role !== expectedRole) {
-    await supabase.auth.signOut();
-    throw new Error("You do not have access to this portal.");
+  await supabase.auth.signOut();
+
+  if (expectedRole === "admin") {
+    redirect("/admin/login?error=invalid");
   }
+
+  throw new Error("You do not have access to this portal.");
+}
 
   if (expectedRole === "worker") {
     const workerStatus = String(profile.status || "pending").toLowerCase();
