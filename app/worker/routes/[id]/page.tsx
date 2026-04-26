@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { createClient } from "../../../../src/lib/supabase/server";
 
 type RouteRecord = {
@@ -45,26 +45,8 @@ function formatTime(value: string | null) {
   return `${hour12}:${minute} ${suffix}`;
 }
 
-function normalizeProperty(
-  value: unknown
-): {
-  id: string;
-  name: string;
-  city: string;
-  state: string;
-  address_line_1: string | null;
-  requires_photo_proof: boolean | null;
-} | null {
-  const normalizeOne = (
-    obj: unknown
-  ): {
-    id: string;
-    name: string;
-    city: string;
-    state: string;
-    address_line_1: string | null;
-    requires_photo_proof: boolean | null;
-  } | null => {
+function normalizeProperty(value: unknown) {
+  const normalizeOne = (obj: unknown) => {
     if (!obj || typeof obj !== "object") return null;
 
     const record = obj as Record<string, unknown>;
@@ -110,19 +92,42 @@ function getStatusBadge(status: string | null) {
 export default async function WorkerRouteDetailPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }) {
-  const { id } = await params;
+  const { id } = params;
   const supabase = await createClient();
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // 🔐 Not logged in
   if (!user) {
-    notFound();
+    redirect("/worker/login");
   }
 
+  // 🔐 Get worker profile
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("status")
+    .eq("id", user.id)
+    .single();
+
+  const workerStatus = String(profile?.status || "").toLowerCase();
+
+  if (workerStatus === "pending") {
+    redirect("/worker/onboarding");
+  }
+
+  if (workerStatus === "suspended") {
+    redirect("/worker/suspended");
+  }
+
+  if (workerStatus !== "approved") {
+    redirect("/worker/login");
+  }
+
+  // 🔍 Get route
   const { data: route, error } = await supabase
     .from("routes")
     .select(`
@@ -178,97 +183,57 @@ export default async function WorkerRouteDetailPage({
     <main className="min-h-screen bg-slate-100 p-8">
       <div className="mx-auto max-w-5xl space-y-8">
         <div className="rounded-3xl bg-gradient-to-r from-slate-900 to-slate-700 p-8 text-white shadow-lg">
-          <p className="text-sm uppercase tracking-[0.2em] text-slate-300">
-            Worker Portal
-          </p>
-          <h1 className="mt-2 text-4xl font-bold">Route Detail</h1>
-          <p className="mt-3 max-w-2xl text-slate-200">
-            Review route timing, payout, and property requirements before service.
+          <h1 className="text-4xl font-bold">Route Detail</h1>
+          <p className="mt-3 text-slate-200">
+            Review route timing, payout, and requirements.
           </p>
         </div>
 
         <section className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div className="flex justify-between">
             <div>
-              <p className="text-3xl font-bold text-slate-900">
-                {typedRoute.properties?.name || "Unknown Property"}
-              </p>
-              <p className="mt-2 text-slate-500">
-                {typedRoute.properties?.address_line_1 || "Address not set"}
+              <p className="text-3xl font-bold">
+                {typedRoute.properties?.name}
               </p>
               <p className="text-slate-500">
-                {typedRoute.properties?.city || "Unknown City"},{" "}
-                {typedRoute.properties?.state || "Unknown State"}
+                {typedRoute.properties?.city}, {typedRoute.properties?.state}
               </p>
             </div>
 
-            <div className="flex flex-col items-start gap-3 md:items-end">
+            <div className="text-right">
               <span
-                className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold capitalize ${getStatusBadge(
+                className={`inline-flex rounded-full border px-3 py-1 text-xs ${getStatusBadge(
                   typedRoute.status
                 )}`}
               >
-                {(typedRoute.status || "unknown").replaceAll("_", " ")}
+                {typedRoute.status}
               </span>
 
-              <p className="text-3xl font-bold text-slate-900">
+              <p className="text-3xl font-bold mt-2">
                 {formatMoney(typedRoute.payout_cents)}
               </p>
             </div>
           </div>
 
-          <div className="mt-8 grid gap-4 md:grid-cols-2">
-            <div className="rounded-2xl bg-slate-50 p-4">
-              <p className="text-sm text-slate-500">Route Date</p>
-              <p className="mt-1 text-lg font-semibold text-slate-900">
-                {typedRoute.route_date || "Not set"}
-              </p>
-            </div>
-
-            <div className="rounded-2xl bg-slate-50 p-4">
-              <p className="text-sm text-slate-500">Route Time</p>
-              <p className="mt-1 text-lg font-semibold text-slate-900">
-                {formatTime(typedRoute.start_time)} - {formatTime(typedRoute.end_time)}
-              </p>
-            </div>
-
-            <div className="rounded-2xl bg-slate-50 p-4">
-              <p className="text-sm text-slate-500">Minimum Worker Score</p>
-              <p className="mt-1 text-lg font-semibold text-slate-900">
-                {typedRoute.minimum_worker_score ?? 0}
-              </p>
-            </div>
-
-            <div className="rounded-2xl bg-slate-50 p-4">
-              <p className="text-sm text-slate-500">Photo Proof Required</p>
-              <p className="mt-1 text-lg font-semibold text-slate-900">
-                {typedRoute.properties?.requires_photo_proof ? "Yes" : "No"}
-              </p>
-            </div>
-
-            <div className="rounded-2xl bg-slate-50 p-4">
-              <p className="text-sm text-slate-500">Claimed Status</p>
-              <p className="mt-1 text-lg font-semibold text-slate-900">
-                {typedRoute.claimed_by ? "Claimed" : "Open"}
-              </p>
-            </div>
-
-            <div className="rounded-2xl bg-slate-50 p-4">
-              <p className="text-sm text-slate-500">Late Notice Sent</p>
-              <p className="mt-1 text-lg font-semibold text-slate-900">
-                {typedRoute.late_notified ? "Yes" : "No"}
-              </p>
-            </div>
+          <div className="mt-6 space-y-2">
+            <p>Date: {typedRoute.route_date}</p>
+            <p>
+              Time: {formatTime(typedRoute.start_time)} -{" "}
+              {formatTime(typedRoute.end_time)}
+            </p>
+            <p>Minimum Score: {typedRoute.minimum_worker_score}</p>
+            <p>
+              Photo Proof:{" "}
+              {typedRoute.properties?.requires_photo_proof ? "Yes" : "No"}
+            </p>
           </div>
 
-          <div className="mt-6">
-            <Link
-              href="/worker/routes"
-              className="inline-flex rounded-2xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-            >
-              Back to Routes
-            </Link>
-          </div>
+          <Link
+            href="/worker/routes"
+            className="mt-6 inline-block rounded-xl bg-slate-900 px-4 py-2 text-white"
+          >
+            Back
+          </Link>
         </section>
       </div>
     </main>
