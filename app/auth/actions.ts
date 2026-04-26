@@ -113,8 +113,14 @@ export async function signUpWorker(formData: FormData) {
   });
 
   if (signUpError) {
-    throw new Error(signUpError.message);
+  const message = signUpError.message.toLowerCase();
+
+  if (message.includes("already registered") || message.includes("already exists")) {
+    redirect("/signup/worker?error=already_registered");
   }
+
+  redirect("/signup/worker?error=signup_failed");
+}
 
   const userId = signUpData.user?.id;
 
