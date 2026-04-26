@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { requireAdmin } from "../../../src/lib/auth/require-admin";
-import { createClient } from "../../../src/lib/supabase/server";
+import { requireAdmin } from "../../src/lib/auth/require-admin";
+import { createClient } from "../../src/lib/supabase/server";
 
 type PendingPhoto = {
   id: string;
