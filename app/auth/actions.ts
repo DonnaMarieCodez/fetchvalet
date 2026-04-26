@@ -112,10 +112,10 @@ export async function signUpWorker(formData: FormData) {
     },
   });
 
-  if (signUpError) {
+if (signUpError) {
   const message = signUpError.message.toLowerCase();
 
-  if (message.includes("already registered") || message.includes("already exists")) {
+  if (message.includes("already registered")) {
     redirect("/signup/worker?error=already_registered");
   }
 
