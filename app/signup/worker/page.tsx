@@ -2,30 +2,34 @@ import { signUpWorker } from "../../auth/actions";
 
 export default function WorkerSignupPage() {
   return (
-    <main className="min-h-screen bg-slate-50 p-8">
-      <div className="mx-auto max-w-xl rounded-2xl border bg-white p-6 shadow-sm">
-        <h1 className="text-3xl font-bold text-slate-900">Worker Sign Up</h1>
-        <p className="mt-2 text-slate-600">
-          Create your worker account to claim routes and track earnings.
-        </p>
+    <main className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+      <div className="w-full max-w-xl rounded-2xl border bg-white p-8 shadow-sm">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-slate-900">
+            Become a FetchValet Worker
+          </h1>
+          <p className="mt-2 text-slate-600">
+            Start earning on your schedule. Complete a few steps to get approved.
+          </p>
 
-        <form action={signUpWorker} className="mt-6 space-y-4">
+          {/* Step indicator */}
+          <div className="mt-4 text-sm text-blue-600 font-medium">
+            Step 1 of 3 — Create your account
+          </div>
+        </div>
+
+        <form action={signUpWorker} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700">
-              Full Name
-            </label>
+            <label className="text-sm font-medium">Full Name</label>
             <input
               name="fullName"
-              type="text"
               required
               className="mt-1 w-full rounded-xl border px-3 py-2"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700">
-              Email
-            </label>
+            <label className="text-sm font-medium">Email</label>
             <input
               name="email"
               type="email"
@@ -35,20 +39,15 @@ export default function WorkerSignupPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700">
-              Phone
-            </label>
+            <label className="text-sm font-medium">Phone</label>
             <input
               name="phone"
-              type="text"
               className="mt-1 w-full rounded-xl border px-3 py-2"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700">
-              Password
-            </label>
+            <label className="text-sm font-medium">Password</label>
             <input
               name="password"
               type="password"
@@ -57,11 +56,8 @@ export default function WorkerSignupPage() {
             />
           </div>
 
-          <button
-            type="submit"
-            className="w-full rounded-xl bg-slate-900 px-4 py-2 text-white"
-          >
-            Create Worker Account
+          <button className="w-full rounded-xl bg-blue-600 py-3 text-white font-medium">
+            Continue →
           </button>
         </form>
       </div>

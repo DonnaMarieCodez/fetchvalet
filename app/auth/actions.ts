@@ -119,7 +119,7 @@ export async function signUpWorker(formData: FormData) {
   const userId = signUpData.user?.id;
 
   if (!userId) {
-    redirect("/worker/status");
+    redirect("/worker/onboarding");
   }
 
   const { error: profileError } = await supabase.from("profiles").upsert({
