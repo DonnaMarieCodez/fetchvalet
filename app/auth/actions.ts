@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { createClient } from "../../src/lib/supabase/server";
+import { createClient } from "@/src/lib/supabase/server";
 
 async function signInAndRoute(
   email: string,
@@ -78,10 +78,44 @@ async function signInAndRoute(
 }
 
 export async function loginAdmin(formData: FormData) {
-  const email = String(formData.get("email") || "");
-  const password = String(formData.get("password") || "");
+  const email = String(formData.get("email") || "").trim().toLowerCase();
+  const password = String(formData.get("password") || "").trim();
 
-  await signInAndRoute(email, password, "admin", "/admin");
+  if (!email || !password) {
+    redirect("/admin/login?error=missing");
+  }
+
+  const supabase = await createClient();
+
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (signInError) {
+    redirect("/admin/login?error=invalid");
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/admin/login?error=invalid");
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role, status")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (!profile || profile.role !== "admin") {
+    await supabase.auth.signOut();
+    redirect("/admin/login?error=unauthorized");
+  }
+
+  redirect("/admin");
 }
 
 export async function loginWorker(formData: FormData) {
