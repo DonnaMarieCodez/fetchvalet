@@ -1,89 +1,92 @@
-import Link from "next/link";
+import { loginAdmin } from "@/app/auth/actions";
+import { redirect } from "next/navigation";
 
-export default function LoginSelectorPage() {
+export default function AdminLoginPage({
+  searchParams,
+}: {
+  searchParams?: { error?: string };
+}) {
+  const error = searchParams?.error;
+
   return (
-    <main className="min-h-screen bg-slate-100">
-      <div className="mx-auto flex min-h-screen max-w-6xl items-center px-6 py-12">
-        <div className="w-full space-y-10">
-          <div className="text-center">
-            <div className="inline-flex rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm">
-              FetchValet Login
-            </div>
-            <h1 className="mt-4 text-5xl font-bold tracking-tight text-slate-900">
-              Choose your portal
-            </h1>
-            <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-600">
-              Sign in to the right FetchValet experience for your role.
-            </p>
+    <main className="min-h-screen bg-black flex items-center justify-center px-4">
+      <div className="w-full max-w-md rounded-3xl bg-white p-8 shadow-2xl">
+        {/* Header */}
+        <div className="mb-6">
+          <p className="text-xs font-semibold uppercase tracking-widest text-blue-600">
+            Admin Login
+          </p>
+          <h1 className="mt-2 text-2xl font-bold text-slate-900">
+            Sign in to FetchValet
+          </h1>
+          <p className="mt-2 text-sm text-slate-600">
+            Authorized administrators only.
+          </p>
+        </div>
+
+        {/* Form */}
+        <form action={loginAdmin} className="space-y-5">
+          <div>
+            <label className="text-sm font-medium text-slate-700">
+              Email
+            </label>
+            <input
+              name="email"
+              type="email"
+              required
+              className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-black"
+              placeholder="admin@fetchvalet.com"
+            />
           </div>
 
-          <div className="grid gap-6 md:grid-cols-3">
-            <Link
-              href="/admin/login"
-              className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
-            >
-              <p className="text-sm uppercase tracking-[0.2em] text-slate-500">
-                Admin
-              </p>
-              <h2 className="mt-3 text-3xl font-bold text-slate-900">
-                Admin Portal
-              </h2>
-              <p className="mt-4 text-sm leading-6 text-slate-600">
-                Manage workers, routes, properties, payouts, invoices, and
-                operations.
-              </p>
-              <div className="mt-6 text-sm font-semibold text-blue-600">
-                Go to Admin Login →
-              </div>
-            </Link>
-
-            <Link
-              href="/worker/login"
-              className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
-            >
-              <p className="text-sm uppercase tracking-[0.2em] text-slate-500">
-                Worker
-              </p>
-              <h2 className="mt-3 text-3xl font-bold text-slate-900">
-                Worker Portal
-              </h2>
-              <p className="mt-4 text-sm leading-6 text-slate-600">
-                Claim routes, manage your work, improve your score, and track
-                payouts.
-              </p>
-              <div className="mt-6 text-sm font-semibold text-blue-600">
-                Go to Worker Login →
-              </div>
-            </Link>
-
-            <Link
-              href="/property/login"
-              className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
-            >
-              <p className="text-sm uppercase tracking-[0.2em] text-slate-500">
-                Property
-              </p>
-              <h2 className="mt-3 text-3xl font-bold text-slate-900">
-                Property Portal
-              </h2>
-              <p className="mt-4 text-sm leading-6 text-slate-600">
-                Review schedules, proof photos, invoices, and property service
-                details.
-              </p>
-              <div className="mt-6 text-sm font-semibold text-blue-600">
-                Go to Property Login →
-              </div>
-            </Link>
+          <div>
+            <label className="text-sm font-medium text-slate-700">
+              Password
+            </label>
+            <input
+              name="password"
+              type="password"
+              required
+              className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-black"
+              placeholder="Enter password"
+            />
           </div>
 
-          <div className="text-center">
-            <Link
-              href="/"
-              className="rounded-2xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-            >
-              Back to Homepage
-            </Link>
+          <button
+            type="submit"
+            className="w-full rounded-xl bg-black py-3 text-white font-semibold hover:bg-slate-900 transition"
+          >
+            Log In
+          </button>
+        </form>
+
+        {/* Errors */}
+        {error === "invalid" && (
+          <div className="mt-5 rounded-xl bg-red-50 p-3 text-sm text-red-600">
+            Invalid email or password.
           </div>
+        )}
+
+        {error === "unauthorized" && (
+          <div className="mt-5 rounded-xl bg-red-50 p-3 text-sm text-red-600">
+            You are not authorized as an admin.
+          </div>
+        )}
+
+        {error === "missing" && (
+          <div className="mt-5 rounded-xl bg-yellow-50 p-3 text-sm text-yellow-700">
+            Please enter email and password.
+          </div>
+        )}
+
+        {/* Back */}
+        <div className="mt-6 text-center">
+          <a
+            href="/"
+            className="text-sm text-blue-600 hover:underline"
+          >
+            Back to homepage
+          </a>
         </div>
       </div>
     </main>
