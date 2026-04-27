@@ -1,10 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "../../../../src/lib/supabase/server";
+import { createAdminClient } from "@/src/lib/supabase/admin";
 
 export async function uploadProofPhoto(formData: FormData) {
-  const supabase = await createClient();
+  const supabase = await createAdminClient();
 
   const propertyId = String(formData.get("propertyId") ?? "");
   const routeIdRaw = String(formData.get("routeId") ?? "");
