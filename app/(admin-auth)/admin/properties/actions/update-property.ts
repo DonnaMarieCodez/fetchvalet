@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { createClient } from "../../../../src/lib/supabase/server";
+import { createAdminClient } from "@/src/lib/supabase/admin";
 
 export async function updateProperty(formData: FormData) {
   const propertyId = String(formData.get("propertyId") || "").trim();
@@ -100,7 +100,7 @@ export async function updateProperty(formData: FormData) {
     throw new Error("Max units per route must be a valid number.");
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const { error } = await supabase
     .from("properties")

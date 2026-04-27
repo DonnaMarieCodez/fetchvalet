@@ -1,10 +1,10 @@
 "use server";
 
-import { createClient } from "../../../../src/lib/supabase/server";
+import { createAdminClient } from "@/src/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 
 export async function createBuilding(formData: FormData) {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const propertyId = String(formData.get("propertyId") || "").trim();
   const name = String(formData.get("name") || "").trim();
@@ -26,7 +26,7 @@ export async function createBuilding(formData: FormData) {
 }
 
 export async function updateBuilding(formData: FormData) {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const propertyId = String(formData.get("propertyId") || "").trim();
   const buildingId = String(formData.get("buildingId") || "").trim();
@@ -49,7 +49,7 @@ export async function updateBuilding(formData: FormData) {
 }
 
 export async function deleteBuilding(formData: FormData) {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const propertyId = String(formData.get("propertyId") || "").trim();
   const buildingId = String(formData.get("buildingId") || "").trim();
@@ -80,7 +80,7 @@ export async function deleteBuilding(formData: FormData) {
 }
 
 export async function createUnits(formData: FormData) {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const propertyId = String(formData.get("propertyId") || "").trim();
   const buildingId = String(formData.get("buildingId") || "").trim();
@@ -116,7 +116,7 @@ export async function createUnits(formData: FormData) {
 }
 
 export async function generateUnits(formData: FormData) {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const propertyId = String(formData.get("propertyId") || "").trim();
   const buildingId = String(formData.get("buildingId") || "").trim();
@@ -171,7 +171,7 @@ export async function generateUnits(formData: FormData) {
 }
 
 export async function deleteUnit(formData: FormData) {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const propertyId = String(formData.get("propertyId") || "").trim();
   const unitId = String(formData.get("unitId") || "").trim();
@@ -190,7 +190,7 @@ export async function deleteUnit(formData: FormData) {
 }
 
 export async function updatePropertyStatus(formData: FormData) {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const propertyId = String(formData.get("propertyId") || "").trim();
   const propertyStatus = String(formData.get("propertyStatus") || "").trim();

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { createClient } from "../../../../src/lib/supabase/server";
+import { createAdminClient } from "@/src/lib/supabase/admin";
 
 type PendingPhoto = {
   id: string;
@@ -43,7 +43,7 @@ function normalizeProperty(value: unknown): { name: string } | null {
 }
 
 export default async function ReviewProofPhotosPage() {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const { data: photos, error } = await supabase
     .from("proof_photos")

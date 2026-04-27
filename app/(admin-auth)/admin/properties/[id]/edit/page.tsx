@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { createClient } from "../../../../../src/lib/supabase/server";
+import { createAdminClient } from "@/src/lib/supabase/admin";
 import { updateProperty } from "../../actions/update-property";
 
 type PropertyRecord = {
@@ -48,7 +48,7 @@ export default async function EditPropertyPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const { data: property, error } = await supabase
     .from("properties")

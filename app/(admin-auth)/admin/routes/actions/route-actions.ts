@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient } from "../../../../src/lib/supabase/server";
+import { createAdminClient } from "@/src/lib/supabase/admin";
 import { generateRoutesForProperty } from "./create-route";
 
 const DAY_NAMES = [
@@ -54,7 +54,7 @@ export async function autoGenerateRoutesForToday(
   _formData: FormData
 ): Promise<AutoGenerateState> {
   try {
-    const supabase = await createClient();
+    const supabase = await createAdminClient();
 
     const targetDate = getTargetRouteDate();
     const routeDate = targetDate.toISOString().slice(0, 10);
@@ -158,7 +158,7 @@ export async function deleteRoute(formData: FormData) {
     throw new Error("Route ID is required.");
   }
 
-  const supabase = await createClient();
+  const supabase = await createAdminClient();
 
   const { error: stopDeleteError } = await supabase
     .from("route_stops")

@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "../../../../src/lib/supabase/server";
+import { createAdminClient } from "@/src/lib/supabase/admin";
 
 const ALLOWED_STATUSES = ["approved", "rejected", "suspended", "pending"] as const;
 type WorkerStatus = (typeof ALLOWED_STATUSES)[number];
@@ -22,7 +22,7 @@ export async function updateWorkerStatus(formData: FormData) {
     throw new Error("Invalid worker status.");
   }
 
-  const supabase = await createClient();
+  const supabase = await createAdminClient();
 
   const { error } = await supabase
     .from("profiles")

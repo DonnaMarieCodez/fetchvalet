@@ -1,8 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "../../../src/lib/supabase/server";
-import { getStripe } from "../../../src/lib/stripe";
+import { createAdminClient } from "@/src/lib/supabase/admin";
+import { getStripe } from "@/src/lib/stripe";
 
 export async function releaseWorkerPayout(formData: FormData) {
   const routeId = String(formData.get("routeId") || "");
@@ -11,7 +11,7 @@ export async function releaseWorkerPayout(formData: FormData) {
     throw new Error("Route ID is required.");
   }
 
-  const supabase = await createClient();
+  const supabase = await createAdminClient();
   const stripe = getStripe();
 
   const { data: route, error: routeError } = await supabase

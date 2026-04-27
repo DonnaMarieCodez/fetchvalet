@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { createClient } from "../../../../src/lib/supabase/server";
+import { createAdminClient } from "@/src/lib/supabase/admin";
 
 type PropertyRecord = {
   id: string;
@@ -39,7 +39,7 @@ export async function createRoute(formData: FormData) {
     throw new Error("Property, date, start time, and end time are required.");
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   await generateRoutesForProperty({
     supabase,
@@ -63,7 +63,7 @@ export async function generateRoutesForProperty({
   payoutCentsOverride,
   minimumWorkerScoreOverride,
 }: {
-  supabase: Awaited<ReturnType<typeof createClient>>;
+  supabase: Awaited<ReturnType<typeof createAdminClient>>;
   propertyId: string;
   routeDate: string;
   startTime: string;

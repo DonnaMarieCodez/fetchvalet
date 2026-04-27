@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { createClient } from "../../../../src/lib/supabase/server";
+import { createAdminClient } from "@/src/lib/supabase/admin";
 import { sendWorkerPasswordReset } from "../actions/send-password-reset";
 import { updateWorkerStatus } from "../actions/update-worker-status";
 
@@ -38,7 +38,7 @@ export default async function WorkerDetailPage({
     notFound();
   }
 
-  const supabase = await createClient();
+  const supabase = await createAdminClient ();
 
   const { data: worker, error } = await supabase
     .from("profiles")

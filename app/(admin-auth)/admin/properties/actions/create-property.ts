@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient } from "../../../../src/lib/supabase/server";
+import { createAdminClient } from "@/src/lib/supabase/admin";
 import { redirect } from "next/navigation";
 
 export async function createProperty(formData: FormData) {
@@ -63,7 +63,7 @@ export async function createProperty(formData: FormData) {
     throw new Error("Default minimum worker score must be a valid number.");
   }
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const { error } = await supabase.from("properties").insert({
     name,

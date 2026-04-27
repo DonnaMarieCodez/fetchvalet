@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { createClient } from "../../../../src/lib/supabase/server";
+import { createAdminClient } from "@/src/lib/supabase/admin";
 
 function getLastDayOfMonth(year: number, month: number) {
   return new Date(Date.UTC(year, month, 0)).getUTCDate();
@@ -21,7 +21,7 @@ export async function createInvoice(formData: FormData) {
     throw new Error("Property and due date are required.");
   }
 
-  const supabase = await createClient();
+const supabase = createAdminClient();
   const issueDate = new Date().toISOString().slice(0, 10);
 
   const { data: property, error: propertyError } = await supabase
@@ -88,7 +88,7 @@ export async function bulkGenerateMonthlyInvoices(formData: FormData) {
   )}`;
   const issueDate = new Date().toISOString().slice(0, 10);
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const { data: properties, error: propertiesError } = await supabase
     .from("properties")
@@ -161,7 +161,7 @@ export async function bulkGenerateMonthlyInvoices(formData: FormData) {
 }
 
 export async function updateInvoice(formData: FormData) {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const invoiceId = String(formData.get("invoiceId") || "").trim();
   const dueDate = String(formData.get("dueDate") || "").trim();
@@ -195,7 +195,7 @@ export async function updateInvoice(formData: FormData) {
 }
 
 export async function recordInvoicePayment(formData: FormData) {
-  const supabase = await createClient();
+ const supabase = createAdminClient();
 
   const invoiceId = String(formData.get("invoiceId") || "").trim();
   const paymentDate = String(formData.get("paymentDate") || "").trim();
@@ -278,7 +278,7 @@ export async function recordInvoicePayment(formData: FormData) {
 }
 
 export async function deleteInvoice(formData: FormData) {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const invoiceId = String(formData.get("invoiceId") || "").trim();
 

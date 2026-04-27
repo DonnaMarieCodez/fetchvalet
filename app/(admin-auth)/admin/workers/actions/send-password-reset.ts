@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createAdminClient } from "../../../../src/lib/supabase/admin";
+import { createAdminClient } from "@/src/lib/supabase/admin";
 
 export async function sendWorkerPasswordReset(formData: FormData) {
   const workerId = String(formData.get("workerId") ?? "").trim();

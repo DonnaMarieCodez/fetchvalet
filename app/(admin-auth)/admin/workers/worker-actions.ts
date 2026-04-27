@@ -1,10 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "../../../src/lib/supabase/server";
+import { createAdminClient } from "@/src/lib/supabase/admin";
 
 async function updateWorkerStatus(workerId: string, nextStatus: string) {
-  const supabase = await createClient();
+  const supabase = await createAdminClient();
 
   if (!workerId) {
     throw new Error("Worker ID is required.");
