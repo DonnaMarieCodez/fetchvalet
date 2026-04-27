@@ -1,10 +1,10 @@
 "use server";
 
-import { createClient } from "../../../src/lib/supabase/server";
+import { createAdminClient } from "@/src/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 
 export async function addBuilding(formData: FormData) {
-  const supabase = await createClient();
+  const supabase = await createAdminClient();
 
   const propertyId = String(formData.get("propertyId"));
   const name = String(formData.get("name"));
@@ -18,7 +18,7 @@ export async function addBuilding(formData: FormData) {
 }
 
 export async function addUnit(formData: FormData) {
-  const supabase = await createClient();
+  const supabase = await createAdminClient();
 
   const buildingId = String(formData.get("buildingId"));
   const unitNumber = String(formData.get("unitNumber"));
@@ -33,7 +33,7 @@ export async function addUnit(formData: FormData) {
 }
 
 export async function generateUnits(formData: FormData) {
-  const supabase = await createClient();
+  const supabase = await createAdminClient();
 
   const buildingId = String(formData.get("buildingId"));
   const start = Number(formData.get("start"));
