@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { createClient } from "../../../../src/lib/supabase/server";
+import { createAdminClient } from "@/src/lib/supabase/admin";
 
 function getLastDayOfMonth(year: number, month: number) {
   return new Date(Date.UTC(year, month, 0)).getUTCDate();
@@ -35,7 +35,7 @@ export async function createMonthlyInvoice(formData: FormData) {
   )}`;
   const issueDate = new Date().toISOString().slice(0, 10);
 
-  const supabase = await createClient();
+  const supabase = await createAdminClient();
 
   const { data: property, error: propertyError } = await supabase
     .from("properties")
