@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "../../../src/lib/supabase/server";
+import { createAdminClient } from "@/src/lib/supabase/admin";
 
 type ComplaintRecord = {
   id: string;
@@ -30,7 +30,7 @@ export async function applyComplaintOutcome(formData: FormData) {
     throw new Error("Score impact must be a valid number.");
   }
 
-  const supabase = await createClient();
+  const supabase = await createAdminClient();
 
   const { data: complaint, error: complaintError } = await supabase
     .from("complaints")
