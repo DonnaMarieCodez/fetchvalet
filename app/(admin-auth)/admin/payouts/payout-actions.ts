@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "../../../src/lib/supabase/server";
+import { createAdminClient } from "@/src/lib/supabase/admin";
 
 export async function updatePayoutStatus(formData: FormData) {
   const routeId = String(formData.get("routeId") || "").trim();
@@ -16,7 +16,7 @@ export async function updatePayoutStatus(formData: FormData) {
     throw new Error("Invalid payout status.");
   }
 
-  const supabase = await createClient();
+  const supabase = await createAdminClient();
 
   const updatePayload: {
     payout_status: string;
