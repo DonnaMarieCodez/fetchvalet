@@ -1,10 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "../../../../src/lib/supabase/server";
+import { createAdminClient } from "@/src/lib/supabase/admin";
 
 export async function approveProofPhoto(formData: FormData) {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const photoId = String(formData.get("photoId") ?? "");
 
   if (!photoId) throw new Error("Missing photo id.");
@@ -31,7 +31,7 @@ export async function approveProofPhoto(formData: FormData) {
 }
 
 export async function rejectProofPhoto(formData: FormData) {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const photoId = String(formData.get("photoId") ?? "");
   const rejectionReasonRaw = String(formData.get("rejectionReason") ?? "").trim();
 
