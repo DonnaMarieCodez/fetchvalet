@@ -1,123 +1,68 @@
 import Link from "next/link";
-import { loginProperty } from "../../auth/actions";
+import { loginProperty } from "@/app/auth/actions";
 
-export default function PropertyLoginPage() {
+type Props = {
+  searchParams?: Promise<{ error?: string }>;
+};
+
+export default async function PropertyLoginPage({ searchParams }: Props) {
+  const params = await searchParams;
+  const error = params?.error;
+
   return (
-    <main className="min-h-screen bg-slate-100">
-      <div className="mx-auto flex min-h-screen max-w-6xl items-center px-6 py-12">
-        <div className="grid w-full gap-10 lg:grid-cols-2 lg:items-center">
-          <section className="space-y-6">
-            <div className="inline-flex rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm">
-              FetchValet Property Portal
-            </div>
+    <main className="flex min-h-screen items-center justify-center bg-slate-100 p-6">
+      <section className="w-full max-w-md rounded-3xl bg-white p-8 shadow-xl">
+        <p className="text-xs font-black uppercase tracking-[0.25em] text-blue-600">
+          Property Login
+        </p>
 
-            <div>
-              <h1 className="text-5xl font-bold tracking-tight text-slate-900">
-                Manage valet trash
-                <span className="block text-blue-600">without the hassle</span>
-              </h1>
-              <p className="mt-4 max-w-xl text-lg text-slate-600">
-                Sign in to review service schedules, proof photos, invoices, and
-                property activity all in one place.
-              </p>
-            </div>
+        <h1 className="mt-3 text-3xl font-black text-slate-950">
+          Sign in to your property portal
+        </h1>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                <p className="text-sm text-slate-500">Operations</p>
-                <p className="mt-2 text-2xl font-bold text-slate-900">
-                  Track service
-                </p>
-              </div>
+        <p className="mt-2 text-sm text-slate-600">
+          Manage service, invoices, proof photos, and property details.
+        </p>
 
-              <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                <p className="text-sm text-slate-500">Billing</p>
-                <p className="mt-2 text-2xl font-bold text-slate-900">
-                  View invoices
-                </p>
-              </div>
-            </div>
+        {error && (
+          <div className="mt-5 rounded-xl bg-red-50 p-4 text-sm font-semibold text-red-700">
+            {error === "missing"
+              ? "Please enter your email and password."
+              : error === "unauthorized"
+                ? "This account is not a property account."
+                : "Invalid email or password."}
+          </div>
+        )}
 
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href="/"
-                className="rounded-2xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-              >
-                Back to Homepage
-              </Link>
+        <form action={loginProperty} className="mt-8 space-y-5">
+          <input
+            name="email"
+            type="email"
+            required
+            placeholder="Email"
+            className="w-full rounded-xl border px-4 py-3"
+          />
 
-              <Link
-                href="/property/onboarding"
-                className="rounded-2xl px-5 py-3 text-sm font-semibold text-blue-600 transition hover:text-blue-700"
-              >
-                New property setup
-              </Link>
-            </div>
-          </section>
+          <input
+            name="password"
+            type="password"
+            required
+            placeholder="Password"
+            className="w-full rounded-xl border px-4 py-3"
+          />
 
-          <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/60">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">
-                Property Login
-              </p>
-              <h2 className="mt-2 text-3xl font-bold text-slate-900">
-                Sign in to your property portal
-              </h2>
-              <p className="mt-3 text-slate-600">
-                Use your property account email and password to monitor service
-                and manage your account.
-              </p>
-            </div>
+          <button className="w-full rounded-xl bg-blue-600 py-3 font-semibold text-white">
+            Log In
+          </button>
+        </form>
 
-            <form action={loginProperty} className="mt-8 space-y-5">
-              <div>
-                <label className="block text-sm font-medium text-slate-700">
-                  Email
-                </label>
-                <input
-                  name="email"
-                  type="email"
-                  required
-                  autoComplete="email"
-                  className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-slate-900 outline-none transition focus:border-slate-900"
-                  placeholder="manager@property.com"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700">
-                  Password
-                </label>
-                <input
-                  name="password"
-                  type="password"
-                  required
-                  autoComplete="current-password"
-                  className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-slate-900 outline-none transition focus:border-slate-900"
-                  placeholder="Enter your password"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
-              >
-                Log In as Property
-              </button>
-            </form>
-
-            <p className="mt-6 text-sm text-slate-600">
-              New property?{" "}
-              <Link
-                href="/property/onboarding"
-                className="font-semibold text-blue-600 underline underline-offset-2"
-              >
-                Set up your property
-              </Link>
-            </p>
-          </section>
-        </div>
-      </div>
+        <Link
+          href="/property/onboarding"
+          className="mt-6 block text-center text-sm font-semibold text-blue-600"
+        >
+          Request service
+        </Link>
+      </section>
     </main>
   );
 }

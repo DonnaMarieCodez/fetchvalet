@@ -1,10 +1,8 @@
 import Link from "next/link";
-import { loginAdmin } from "../../../auth/actions";
+import { loginAdmin } from "@/app/auth/actions";
 
 type Props = {
-  searchParams?: Promise<{
-    error?: string;
-  }>;
+  searchParams?: Promise<{ error?: string }>;
 };
 
 export default async function AdminLoginPage({ searchParams }: Props) {
@@ -14,7 +12,7 @@ export default async function AdminLoginPage({ searchParams }: Props) {
   return (
     <main className="flex min-h-screen items-center justify-center bg-black p-6">
       <section className="w-full max-w-md rounded-3xl bg-white p-8 shadow-2xl">
-        <p className="text-sm font-bold uppercase tracking-[0.25em] text-blue-600">
+        <p className="text-xs font-black uppercase tracking-[0.25em] text-blue-600">
           Admin Login
         </p>
 
@@ -27,51 +25,48 @@ export default async function AdminLoginPage({ searchParams }: Props) {
         </p>
 
         {error && (
-          <div className="mt-5 rounded-2xl bg-rose-50 p-4 text-sm font-semibold text-rose-700">
-            Invalid admin login. Please check your email and password.
+          <div className="mt-5 rounded-xl bg-red-50 p-4 text-sm font-semibold text-red-700">
+            {error === "missing"
+              ? "Please enter your email and password."
+              : error === "unauthorized"
+                ? "This account is not approved for admin access."
+                : "Invalid email or password."}
           </div>
         )}
 
         <form action={loginAdmin} className="mt-8 space-y-5">
           <div>
-            <label className="block text-sm font-medium text-slate-700">
-              Email
-            </label>
+            <label className="text-sm font-medium text-slate-700">Email</label>
             <input
               name="email"
               type="email"
               required
-              autoComplete="email"
+              className="mt-2 w-full rounded-xl border px-4 py-3"
               placeholder="admin@fetchvalet.com"
-              className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-slate-900 outline-none focus:border-blue-600"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700">
+            <label className="text-sm font-medium text-slate-700">
               Password
             </label>
             <input
               name="password"
               type="password"
               required
-              autoComplete="current-password"
-              placeholder="Enter your password"
-              className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-slate-900 outline-none focus:border-blue-600"
+              className="mt-2 w-full rounded-xl border px-4 py-3"
+              placeholder="Enter password"
             />
           </div>
 
-          <button
-            type="submit"
-            className="w-full rounded-2xl bg-slate-950 px-5 py-3 font-semibold text-white hover:bg-slate-800"
-          >
+          <button className="w-full rounded-xl bg-black py-3 font-semibold text-white">
             Log In
           </button>
         </form>
 
         <Link
           href="/"
-          className="mt-6 block text-center text-sm font-semibold text-blue-600 hover:underline"
+          className="mt-6 block text-center text-sm font-semibold text-blue-600"
         >
           Back to homepage
         </Link>
