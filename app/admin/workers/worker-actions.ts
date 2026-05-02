@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/src/lib/supabase/admin";
 
 async function updateWorkerStatus(workerId: string, nextStatus: string) {
-  const supabase = await createAdminClient();
+  const supabase = createAdminClient();
 
   if (!workerId) {
     throw new Error("Worker ID is required.");
@@ -37,4 +37,8 @@ export async function rejectWorker(formData: FormData) {
 export async function suspendWorker(formData: FormData) {
   const workerId = String(formData.get("workerId") || "");
   await updateWorkerStatus(workerId, "suspended");
+}
+export async function reinstateWorker(formData: FormData) {
+  const workerId = String(formData.get("workerId") || "");
+  await updateWorkerStatus(workerId, "approved");
 }
