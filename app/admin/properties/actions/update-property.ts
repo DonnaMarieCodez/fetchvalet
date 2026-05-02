@@ -13,11 +13,15 @@ export async function updateProperty(formData: FormData) {
   const state = String(formData.get("state") || "").trim();
   const zipCode = String(formData.get("zipCode") || "").trim();
 
-  const propertyManagerName = String(
-    formData.get("propertyManagerName") || ""
-  ).trim();
+  const propertyManagerName = String(formData.get("propertyManagerName") || "").trim();
   const contactPhone = String(formData.get("contactPhone") || "").trim();
   const contactEmail = String(formData.get("contactEmail") || "").trim();
+
+  const billingContactName = String(formData.get("billingContactName") || "").trim();
+  const billingContactEmail = String(formData.get("billingContactEmail") || "").trim();
+
+  const alternateContactName = String(formData.get("alternateContactName") || "").trim();
+  const alternateContactPhone = String(formData.get("alternateContactPhone") || "").trim();
 
   const accessNotes = String(formData.get("accessNotes") || "").trim();
 
@@ -44,34 +48,21 @@ export async function updateProperty(formData: FormData) {
   const autoGenerateRoutes =
     String(formData.get("autoGenerateRoutes") || "") === "on";
 
-  const billingContactName = String(
-    formData.get("billingContactName") || ""
-  ).trim();
-  const billingContactEmail = String(
-    formData.get("billingContactEmail") || ""
-  ).trim();
-
-  const alternateContactName = String(
-    formData.get("alternateContactName") || ""
-  ).trim();
-  const alternateContactPhone = String(
-    formData.get("alternateContactPhone") || ""
-  ).trim();
-
   const defaultRoutePayoutDollars = Number(
     formData.get("defaultRoutePayoutDollars") || 0
   );
+
   const monthlyBillingDollars = Number(
     formData.get("monthlyBillingDollars") || 0
   );
+
   const defaultMinimumWorkerScore = Number(
     formData.get("defaultMinimumWorkerScore") || 0
   );
+
   const maxUnitsPerRoute = Number(formData.get("maxUnitsPerRoute") || 150);
 
-  const specialHandlingNotes = String(
-    formData.get("specialHandlingNotes") || ""
-  ).trim();
+  const specialHandlingNotes = String(formData.get("specialHandlingNotes") || "").trim();
 
   if (!propertyId) {
     throw new Error("Missing property ID.");
@@ -89,10 +80,7 @@ export async function updateProperty(formData: FormData) {
     throw new Error("Monthly billing amount must be a valid number.");
   }
 
-  if (
-    Number.isNaN(defaultMinimumWorkerScore) ||
-    defaultMinimumWorkerScore < 0
-  ) {
+  if (Number.isNaN(defaultMinimumWorkerScore) || defaultMinimumWorkerScore < 0) {
     throw new Error("Default minimum worker score must be a valid number.");
   }
 
@@ -111,25 +99,30 @@ export async function updateProperty(formData: FormData) {
       city,
       state,
       zip_code: zipCode || null,
+
       property_manager_name: propertyManagerName || null,
       contact_phone: contactPhone || null,
       contact_email: contactEmail || null,
-      access_notes: accessNotes || null,
-      service_days: serviceDays || null,
-      recycling_service_days: recyclingServiceDays || null,
-      pickup_start_time: pickupStartTime || null,
-      requires_photo_proof: requiresPhotoProof,
-      resident_reminders_enabled: residentRemindersEnabled,
-      auto_generate_routes: autoGenerateRoutes,
+
       billing_contact_name: billingContactName || null,
       billing_contact_email: billingContactEmail || null,
       alternate_contact_name: alternateContactName || null,
       alternate_contact_phone: alternateContactPhone || null,
+
+      access_notes: accessNotes || null,
+      service_days: serviceDays || null,
+      recycling_service_days: recyclingServiceDays || null,
+      pickup_start_time: pickupStartTime || null,
+
+      requires_photo_proof: requiresPhotoProof,
+      resident_reminders_enabled: residentRemindersEnabled,
+      auto_generate_routes: autoGenerateRoutes,
+      special_handling_notes: specialHandlingNotes || null,
+
       default_route_payout_cents: Math.round(defaultRoutePayoutDollars * 100),
       monthly_billing_cents: Math.round(monthlyBillingDollars * 100),
       default_minimum_worker_score: defaultMinimumWorkerScore,
       max_units_per_route: maxUnitsPerRoute,
-      special_handling_notes: specialHandlingNotes || null,
     })
     .eq("id", propertyId);
 

@@ -202,45 +202,14 @@ export default function NewPropertyPage() {
                   Pickup Start Time
                 </label>
                 <input
-                  name="pickupStartTime"
-                  type="time"
-                  className="mt-1 w-full rounded-2xl border px-3 py-2"
-                />
+  name="pickupStartTime"
+  type="time"
+  defaultValue="20:00"
+  required
+  className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3"
+/>
               </div>
             </div>
-
-            <div className="mt-6 grid gap-6 md:grid-cols-2">
-              <div>
-                <label className="block text-sm font-medium text-slate-700">
-                  Default Route Payout ($)
-                </label>
-                <input
-                  name="defaultRoutePayoutDollars"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  defaultValue="0"
-                  className="mt-1 w-full rounded-2xl border px-3 py-2"
-                  placeholder="95.00"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700">
-                  Default Minimum Worker Score
-                </label>
-                <input
-                  name="defaultMinimumWorkerScore"
-                  type="number"
-                  step="1"
-                  min="0"
-                  defaultValue="0"
-                  className="mt-1 w-full rounded-2xl border px-3 py-2"
-                  placeholder="80"
-                />
-              </div>
-            </div>
-
             <div className="mt-6">
               <label className="block text-sm font-medium text-slate-700">
                 Access Notes
