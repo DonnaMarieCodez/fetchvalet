@@ -2,18 +2,6 @@ import Link from "next/link";
 import { requireAdmin } from "@/src/lib/auth/require-admin";
 import { createAdminClient } from "@/src/lib/supabase/admin";
 
-type PropertyRecord = {
-  id: string;
-  name: string | null;
-  address_line_1: string | null;
-  city: string | null;
-  state: string | null;
-  property_status: string | null;
-  number_of_units: number | null;
-  number_of_buildings: number | null;
-  created_at: string | null;
-};
-
 export default async function AdminPropertiesPage() {
   await requireAdmin();
 
@@ -21,12 +9,10 @@ export default async function AdminPropertiesPage() {
 
   const { data: properties, error } = await supabase
     .from("properties")
-    .select(
-      "id, name, address_line_1, city, state, property_status, number_of_units, number_of_buildings, created_at"
-    )
+    .select("*")
     .order("created_at", { ascending: false });
 
-  const propertyList = (properties ?? []) as PropertyRecord[];
+  const propertyList = properties ?? [];
 
   return (
     <main className="mx-auto max-w-6xl space-y-8 p-6">
@@ -38,7 +24,7 @@ export default async function AdminPropertiesPage() {
             </p>
             <h1 className="mt-3 text-4xl font-black">Properties</h1>
             <p className="mt-3 max-w-2xl text-slate-200">
-              View and manage all properties in the system.
+              View, edit, activate, suspend, and manage properties.
             </p>
           </div>
 
@@ -61,7 +47,6 @@ export default async function AdminPropertiesPage() {
         <div className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
           <p className="text-sm text-slate-500">Total Properties</p>
           <p className="mt-3 text-4xl font-black">{propertyList.length}</p>
-          <p className="mt-2 text-sm text-slate-500">Active locations</p>
         </div>
 
         <div className="rounded-3xl bg-blue-50 p-5 shadow-sm ring-1 ring-blue-100">
@@ -69,18 +54,12 @@ export default async function AdminPropertiesPage() {
           <p className="mt-3 text-xl font-black text-blue-900">
             Add buildings and units
           </p>
-          <p className="mt-2 text-sm text-blue-700">
-            Click into any property to continue setup.
-          </p>
         </div>
 
         <div className="rounded-3xl bg-emerald-50 p-5 shadow-sm ring-1 ring-emerald-100">
           <p className="text-sm text-emerald-700">Next Step</p>
           <p className="mt-3 text-xl font-black text-emerald-900">
-            Generate routes later
-          </p>
-          <p className="mt-2 text-sm text-emerald-700">
-            Once units are built out, route creation gets easier.
+            Generate routes
           </p>
         </div>
       </section>
@@ -104,7 +83,6 @@ export default async function AdminPropertiesPage() {
                       <p className="text-lg font-black text-slate-900">
                         {property.name || "Unnamed Property"}
                       </p>
-
                       <p className="mt-1 text-sm text-slate-500">
                         {property.address_line_1 || "No address"}{" "}
                         {property.city ? `• ${property.city}, ${property.state}` : ""}
@@ -115,11 +93,9 @@ export default async function AdminPropertiesPage() {
                       <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold capitalize text-slate-700">
                         {property.property_status || "pending"}
                       </span>
-
                       <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
                         {property.number_of_units ?? 0} units
                       </span>
-
                       <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
                         {property.number_of_buildings ?? 0} buildings
                       </span>
