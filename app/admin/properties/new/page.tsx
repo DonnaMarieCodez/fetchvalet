@@ -1,284 +1,284 @@
+import Link from "next/link";
+import { requireAdmin } from "@/src/lib/auth/require-admin";
 import { createProperty } from "../actions/create-property";
 
-export default function NewPropertyPage() {
+const SERVICE_DAYS = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
+
+export default async function NewPropertyPage() {
+  await requireAdmin();
+
   return (
-    <>
-      <div className="rounded-3xl bg-gradient-to-r from-slate-900 to-slate-700 p-8 text-white shadow-lg">
-        <p className="text-sm uppercase tracking-[0.2em] text-slate-300">
-          Property Onboarding
+    <main className="mx-auto max-w-5xl p-6">
+      <section className="rounded-3xl bg-slate-900 p-8 text-white shadow-lg">
+        <p className="text-sm uppercase tracking-[0.25em] text-slate-300">
+          FetchValet
         </p>
-        <h1 className="mt-2 text-4xl font-bold">Add New Property</h1>
-        <p className="mt-3 max-w-2xl text-slate-200">
-          Create a property profile with contacts, operations defaults, and service details.
+        <h1 className="mt-3 text-4xl font-black">Property Onboarding</h1>
+        <p className="mt-2 text-slate-300">
+          Add property details, contacts, and service settings. Billing and route
+          payout are set later by admin.
         </p>
-      </div>
+      </section>
 
-      <div className="mt-8 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-        <form action={createProperty} className="space-y-8">
-          <section>
-            <h2 className="text-2xl font-bold text-slate-900">Property Basics</h2>
-            <div className="mt-5 grid gap-6 md:grid-cols-2">
-              <div>
-                <label className="block text-sm font-medium text-slate-700">
-                  Property Name
-                </label>
-                <input
-                  name="name"
-                  required
-                  className="mt-1 w-full rounded-2xl border px-3 py-2"
-                  placeholder="Harbor Point Apartments"
-                />
-              </div>
+      <form
+        action={createProperty}
+        className="mt-8 rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200"
+      >
+        <section>
+          <h2 className="text-2xl font-black text-slate-900">
+            Property Details
+          </h2>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700">
-                  Property Manager Name
-                </label>
-                <input
-                  name="propertyManagerName"
-                  className="mt-1 w-full rounded-2xl border px-3 py-2"
-                  placeholder="Jordan Smith"
-                />
-              </div>
-            </div>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-bold text-slate-900">Address</h2>
-            <div className="mt-5 grid gap-6 md:grid-cols-2">
-              <div>
-                <label className="block text-sm font-medium text-slate-700">
-                  Address Line 1
-                </label>
-                <input
-                  name="addressLine1"
-                  required
-                  className="mt-1 w-full rounded-2xl border px-3 py-2"
-                  placeholder="123 Main Street"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700">
-                  Address Line 2
-                </label>
-                <input
-                  name="addressLine2"
-                  className="mt-1 w-full rounded-2xl border px-3 py-2"
-                  placeholder="Suite, gate, or landmark"
-                />
-              </div>
+          <div className="mt-6 grid gap-5 md:grid-cols-2">
+            <div>
+              <label className="text-sm font-medium text-slate-700">
+                Property Name
+              </label>
+              <input
+                name="name"
+                required
+                className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3"
+              />
             </div>
 
-            <div className="mt-6 grid gap-6 md:grid-cols-4">
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-slate-700">
-                  City
-                </label>
-                <input
-                  name="city"
-                  required
-                  className="mt-1 w-full rounded-2xl border px-3 py-2"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700">
-                  State
-                </label>
-                <input
-                  name="state"
-                  required
-                  className="mt-1 w-full rounded-2xl border px-3 py-2"
-                  placeholder="VA"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700">
-                  ZIP Code
-                </label>
-                <input
-                  name="zipCode"
-                  className="mt-1 w-full rounded-2xl border px-3 py-2"
-                />
-              </div>
-            </div>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-bold text-slate-900">Primary Contacts</h2>
-            <div className="mt-5 grid gap-6 md:grid-cols-2">
-              <div>
-                <label className="block text-sm font-medium text-slate-700">
-                  Contact Phone
-                </label>
-                <input
-                  name="contactPhone"
-                  className="mt-1 w-full rounded-2xl border px-3 py-2"
-                  placeholder="(555) 555-5555"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700">
-                  Contact Email
-                </label>
-                <input
-                  name="contactEmail"
-                  type="email"
-                  className="mt-1 w-full rounded-2xl border px-3 py-2"
-                  placeholder="manager@property.com"
-                />
-              </div>
+            <div>
+              <label className="text-sm font-medium text-slate-700">
+                Address Line 1
+              </label>
+              <input
+                name="addressLine1"
+                required
+                className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3"
+              />
             </div>
 
-            <div className="mt-6 grid gap-6 md:grid-cols-2">
-              <div>
-                <label className="block text-sm font-medium text-slate-700">
-                  Alternate Onsite Contact Name
-                </label>
-                <input
-                  name="alternateContactName"
-                  className="mt-1 w-full rounded-2xl border px-3 py-2"
-                  placeholder="Assistant Manager"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700">
-                  Alternate Onsite Contact Phone
-                </label>
-                <input
-                  name="alternateContactPhone"
-                  className="mt-1 w-full rounded-2xl border px-3 py-2"
-                  placeholder="(555) 222-2222"
-                />
-              </div>
+            <div>
+              <label className="text-sm font-medium text-slate-700">
+                Address Line 2
+              </label>
+              <input
+                name="addressLine2"
+                className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3"
+              />
             </div>
 
-            <div className="mt-6 grid gap-6 md:grid-cols-2">
-              <div>
-                <label className="block text-sm font-medium text-slate-700">
-                  Billing Contact Name
-                </label>
-                <input
-                  name="billingContactName"
-                  className="mt-1 w-full rounded-2xl border px-3 py-2"
-                  placeholder="Accounts Payable"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700">
-                  Billing Contact Email
-                </label>
-                <input
-                  name="billingContactEmail"
-                  type="email"
-                  className="mt-1 w-full rounded-2xl border px-3 py-2"
-                  placeholder="billing@property.com"
-                />
-              </div>
+            <div>
+              <label className="text-sm font-medium text-slate-700">
+                City
+              </label>
+              <input
+                name="city"
+                required
+                className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3"
+              />
             </div>
-          </section>
 
-          <section>
-            <h2 className="text-2xl font-bold text-slate-900">Operations</h2>
-            <div className="mt-5 grid gap-6 md:grid-cols-2">
-              <div>
-                <label className="block text-sm font-medium text-slate-700">
-                  Service Days
-                </label>
-                <input
-                  name="serviceDays"
-                  className="mt-1 w-full rounded-2xl border px-3 py-2"
-                  placeholder="Sunday, Tuesday, Thursday"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700">
-                  Pickup Start Time
-                </label>
-                <input
-  name="pickupStartTime"
-  type="time"
-  defaultValue="20:00"
-  required
-  className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3"
-/>
-              </div>
+            <div>
+              <label className="text-sm font-medium text-slate-700">
+                State
+              </label>
+              <input
+                name="state"
+                required
+                className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3"
+              />
             </div>
-            <div className="mt-6">
-              <label className="block text-sm font-medium text-slate-700">
+
+            <div>
+              <label className="text-sm font-medium text-slate-700">
+                ZIP Code
+              </label>
+              <input
+                name="zipCode"
+                className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3"
+              />
+            </div>
+          </div>
+        </section>
+
+        <hr className="my-8" />
+
+        <section>
+          <h2 className="text-2xl font-black text-slate-900">
+            Primary Contact
+          </h2>
+
+          <div className="mt-6 grid gap-5 md:grid-cols-2">
+            <div>
+              <label className="text-sm font-medium text-slate-700">
+                Manager Name
+              </label>
+              <input
+                name="propertyManagerName"
+                className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-slate-700">
+                Manager Email
+              </label>
+              <input
+                name="contactEmail"
+                type="email"
+                className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-slate-700">
+                Manager Phone
+              </label>
+              <input
+                name="contactPhone"
+                className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-slate-700">
+                Billing Contact Name
+              </label>
+              <input
+                name="billingContactName"
+                className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-slate-700">
+                Billing Contact Email
+              </label>
+              <input
+                name="billingContactEmail"
+                type="email"
+                className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-slate-700">
+                Alternate Contact Name
+              </label>
+              <input
+                name="alternateContactName"
+                className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-slate-700">
+                Alternate Contact Phone
+              </label>
+              <input
+                name="alternateContactPhone"
+                className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3"
+              />
+            </div>
+          </div>
+        </section>
+
+        <hr className="my-8" />
+
+        <section>
+          <h2 className="text-2xl font-black text-slate-900">
+            Service Setup
+          </h2>
+
+          <div className="mt-6 grid gap-5 md:grid-cols-2">
+            <div>
+              <label className="text-sm font-medium text-slate-700">
+                Pickup Start Time
+              </label>
+              <input
+                name="pickupStartTime"
+                type="time"
+                defaultValue="20:00"
+                required
+                className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3"
+              />
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <p className="text-sm font-medium text-slate-700">Service Days</p>
+
+            <div className="mt-3 grid gap-3 md:grid-cols-3">
+              {SERVICE_DAYS.map((day) => (
+                <label
+                  key={day}
+                  className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm"
+                >
+                  <input type="checkbox" name="serviceDays" value={day} />
+                  {day}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-6 grid gap-5 md:grid-cols-2">
+            <div>
+              <label className="text-sm font-medium text-slate-700">
                 Access Notes
               </label>
               <textarea
                 name="accessNotes"
                 rows={4}
-                className="mt-1 w-full rounded-2xl border px-3 py-2"
-                placeholder="Gate code, dumpster access notes, service restrictions, quiet hours, etc."
+                className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3"
+                placeholder="Gate code, dumpster location, building access..."
               />
             </div>
 
-            <div className="mt-6">
-              <label className="block text-sm font-medium text-slate-700">
-                Special Handling Notes
+            <div>
+              <label className="text-sm font-medium text-slate-700">
+                Special Handling
               </label>
               <textarea
                 name="specialHandlingNotes"
                 rows={4}
-                className="mt-1 w-full rounded-2xl border px-3 py-2"
-                placeholder="Overflow protocol, fragile areas, special customer requests, holiday rules, etc."
+                className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3"
+                placeholder="Overflow notes, recycling instructions, exceptions..."
               />
             </div>
-          </section>
+          </div>
 
-          <section>
-            <h2 className="text-2xl font-bold text-slate-900">Automation Settings</h2>
-            <div className="mt-5 grid gap-4">
-              <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-4">
-                <input
-                  id="requiresPhotoProof"
-                  name="requiresPhotoProof"
-                  type="checkbox"
-                  defaultChecked
-                  className="h-4 w-4"
-                />
-                <label
-                  htmlFor="requiresPhotoProof"
-                  className="text-sm font-medium text-slate-700"
-                >
-                  Require building photo proof for this property
-                </label>
-              </div>
+          <div className="mt-6 grid gap-3 md:grid-cols-2">
+            <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
+              <input type="checkbox" name="requiresPhotoProof" defaultChecked />
+              Require proof photos
+            </label>
 
-              <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-4">
-                <input
-                  id="residentRemindersEnabled"
-                  name="residentRemindersEnabled"
-                  type="checkbox"
-                  className="h-4 w-4"
-                />
-                <label
-                  htmlFor="residentRemindersEnabled"
-                  className="text-sm font-medium text-slate-700"
-                >
-                  Enable resident reminders for trash-out days
-                </label>
-              </div>
-            </div>
-          </section>
+            <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
+              <input type="checkbox" name="autoGenerateRoutes" defaultChecked />
+              Auto-generate routes
+            </label>
+          </div>
+        </section>
 
+        <div className="mt-8 flex gap-3 border-t pt-8">
           <button
             type="submit"
-            className="rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+            className="rounded-2xl bg-slate-950 px-6 py-3 font-semibold text-white"
           >
-            Create Property
+            Complete Setup
           </button>
-        </form>
-      </div>
-    </>
+
+          <Link
+            href="/admin/properties"
+            className="rounded-2xl border border-slate-300 px-6 py-3 font-semibold text-slate-700"
+          >
+            Cancel
+          </Link>
+        </div>
+      </form>
+    </main>
   );
 }
