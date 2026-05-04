@@ -2,25 +2,26 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/src/lib/auth/require-admin";
 import { createAdminClient } from "@/src/lib/supabase/admin";
-import {
-  activateProperty,
-  suspendProperty,
-} from "../actions/property-status-actions";
 
-export default async function PropertyDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+type PageProps = {
+  params: Promise<{ id: string }>;
+};
+
+function formatMoney(cents: number | null | undefined) {
+  return `$${((cents ?? 0) / 100).toFixed(2)}`;
+}
+
+export default async function PropertyDetailPage({ params }: PageProps) {
   await requireAdmin();
 
+  const { id } = await params;
   const supabase = createAdminClient();
 
   const { data: property, error } = await supabase
     .from("properties")
     .select("*")
-    .eq("id", params.id)
-    .single();
+    .eq("id", id)
+    .maybeSingle();
 
   if (error || !property) {
     notFound();
@@ -34,18 +35,20 @@ export default async function PropertyDetailPage({
             <p className="text-sm uppercase tracking-[0.25em] text-slate-300">
               Property Setup
             </p>
+
             <h1 className="mt-3 text-4xl font-black">
               {property.name || "Unnamed Property"}
             </h1>
+
             <p className="mt-3 text-slate-200">
               {property.address_line_1 || "No address"}
-              {property.city ? ` • ${property.city}, ${property.state}` : ""}
+              {property.city ? ` • ${property.city}, ${property.state || ""}` : ""}
             </p>
           </div>
 
           <div className="flex flex-wrap gap-3">
             <Link
-              href={`/admin/properties/${property.id}`}
+              href={`/admin/properties/${property.id}/edit`}
               className="rounded-2xl bg-white px-5 py-3 text-sm font-bold text-slate-900"
             >
               Edit Property
@@ -61,54 +64,10 @@ export default async function PropertyDetailPage({
         </div>
       </section>
 
-      <section className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-        <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-          <div>
-            <p className="text-sm text-slate-500">Property Status</p>
-            <p className="mt-1 text-xl font-black capitalize text-slate-900">
-              {property.property_status || "pending"}
-            </p>
-          </div>
-
-          <div className="flex flex-wrap gap-3">
-            <form action={activateProperty}>
-              <input type="hidden" name="propertyId" value={property.id} />
-              <button className="rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-bold text-white">
-                Activate Property
-              </button>
-            </form>
-
-            <form action={suspendProperty}>
-              <input type="hidden" name="propertyId" value={property.id} />
-              <button className="rounded-2xl bg-orange-600 px-5 py-3 text-sm font-bold text-white">
-                Suspend Property
-              </button>
-            </form>
-          </div>
-        </div>
-      </section>
-
       <section className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
-          <p className="text-sm text-slate-500">Buildings</p>
-          <p className="mt-3 text-4xl font-black">
-            {property.number_of_buildings ?? 0}
-          </p>
-        </div>
-
-        <div className="rounded-3xl bg-blue-50 p-5 shadow-sm ring-1 ring-blue-100">
-          <p className="text-sm text-blue-700">Units</p>
-          <p className="mt-3 text-4xl font-black text-blue-900">
-            {property.number_of_units ?? 0}
-          </p>
-        </div>
-
-        <div className="rounded-3xl bg-emerald-50 p-5 shadow-sm ring-1 ring-emerald-100">
-          <p className="text-sm text-emerald-700">Photo Proof</p>
-          <p className="mt-3 text-xl font-black text-emerald-900">
-            {property.requires_photo_proof ? "Required" : "Not required"}
-          </p>
-        </div>
+        <Card label="Status" value={property.property_status || "pending"} />
+        <Card label="Units" value={property.number_of_units ?? 0} />
+        <Card label="Buildings" value={property.number_of_buildings ?? 0} />
       </section>
 
       <section className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
@@ -122,23 +81,8 @@ export default async function PropertyDetailPage({
           <Detail label="Email" value={property.contact_email} />
           <Detail label="Service Days" value={property.service_days} />
           <Detail label="Pickup Time" value={property.pickup_start_time} />
-          <Detail
-            label="Route Payout"
-            value={`$${((property.default_route_payout_cents ?? 0) / 100).toFixed(2)}`}
-          />
-          <Detail
-            label="Monthly Billing"
-            value={`$${((property.monthly_billing_cents ?? 0) / 100).toFixed(2)}`}
-          />
-          <Detail
-            label="Min Worker Score"
-            value={
-              property.default_minimum_worker_score === null ||
-              property.default_minimum_worker_score === undefined
-                ? "Not set"
-                : String(property.default_minimum_worker_score)
-            }
-          />
+          <Detail label="Route Payout" value={formatMoney(property.default_route_payout_cents)} />
+          <Detail label="Monthly Billing" value={formatMoney(property.monthly_billing_cents)} />
           <Detail label="Billing Contact" value={property.billing_contact_name} />
           <Detail label="Alternate Contact" value={property.alternate_contact_name} />
           <Detail label="Access Notes" value={property.access_notes} />
@@ -146,6 +90,17 @@ export default async function PropertyDetailPage({
         </div>
       </section>
     </main>
+  );
+}
+
+function Card({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+      <p className="text-sm text-slate-500">{label}</p>
+      <p className="mt-3 text-3xl font-black capitalize text-slate-900">
+        {value}
+      </p>
+    </div>
   );
 }
 
