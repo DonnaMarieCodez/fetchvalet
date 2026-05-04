@@ -21,7 +21,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
     .from("properties")
     .select("*")
     .eq("id", id)
-    .maybeSingle();
+    .single();
 
   if (error || !property) {
     notFound();
@@ -29,6 +29,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
 
   return (
     <main className="mx-auto max-w-6xl space-y-8 p-6">
+      {/* HEADER */}
       <section className="rounded-3xl bg-gradient-to-r from-slate-900 to-slate-700 p-8 text-white shadow-lg">
         <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
           <div>
@@ -42,13 +43,16 @@ export default async function PropertyDetailPage({ params }: PageProps) {
 
             <p className="mt-3 text-slate-200">
               {property.address_line_1 || "No address"}
-              {property.city ? ` • ${property.city}, ${property.state || ""}` : ""}
+              {property.city
+                ? ` • ${property.city}, ${property.state || ""}`
+                : ""}
             </p>
           </div>
 
           <div className="flex flex-wrap gap-3">
+            {/* ✅ FIXED ROUTE */}
             <Link
-              href={`/admin/properties/${property.id}/edit`}
+              href={`/admin/properties/${id}/edit`}
               className="rounded-2xl bg-white px-5 py-3 text-sm font-bold text-slate-900"
             >
               Edit Property
@@ -64,12 +68,14 @@ export default async function PropertyDetailPage({ params }: PageProps) {
         </div>
       </section>
 
+      {/* STATS */}
       <section className="grid gap-4 md:grid-cols-3">
         <Card label="Status" value={property.property_status || "pending"} />
         <Card label="Units" value={property.number_of_units ?? 0} />
         <Card label="Buildings" value={property.number_of_buildings ?? 0} />
       </section>
 
+      {/* DETAILS */}
       <section className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
         <h2 className="text-2xl font-black text-slate-900">
           Property Details
@@ -81,8 +87,17 @@ export default async function PropertyDetailPage({ params }: PageProps) {
           <Detail label="Email" value={property.contact_email} />
           <Detail label="Service Days" value={property.service_days} />
           <Detail label="Pickup Time" value={property.pickup_start_time} />
-          <Detail label="Route Payout" value={formatMoney(property.default_route_payout_cents)} />
-          <Detail label="Monthly Billing" value={formatMoney(property.monthly_billing_cents)} />
+
+          {/* Optional financials (safe) */}
+          <Detail
+            label="Route Payout"
+            value={formatMoney(property.default_route_payout_cents)}
+          />
+          <Detail
+            label="Monthly Billing"
+            value={formatMoney(property.monthly_billing_cents)}
+          />
+
           <Detail label="Billing Contact" value={property.billing_contact_name} />
           <Detail label="Alternate Contact" value={property.alternate_contact_name} />
           <Detail label="Access Notes" value={property.access_notes} />
@@ -93,7 +108,15 @@ export default async function PropertyDetailPage({ params }: PageProps) {
   );
 }
 
-function Card({ label, value }: { label: string; value: string | number }) {
+/* COMPONENTS */
+
+function Card({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | number;
+}) {
   return (
     <div className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
       <p className="text-sm text-slate-500">{label}</p>
@@ -115,7 +138,9 @@ function Detail({
     <div>
       <p className="text-sm text-slate-500">{label}</p>
       <p className="mt-1 font-semibold text-slate-900">
-        {value === null || value === undefined || value === "" ? "None" : value}
+        {value === null || value === undefined || value === ""
+          ? "None"
+          : value}
       </p>
     </div>
   );
