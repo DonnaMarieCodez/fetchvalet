@@ -9,7 +9,9 @@ export default async function AdminPropertiesPage() {
 
   const { data: properties, error } = await supabase
     .from("properties")
-    .select("*")
+    .select(
+      "id, name, address_line_1, city, state, property_status, number_of_units, number_of_buildings, created_at"
+    )
     .order("created_at", { ascending: false });
 
   const propertyList = properties ?? [];
@@ -76,16 +78,23 @@ export default async function AdminPropertiesPage() {
                 <Link
                   key={property.id}
                   href={`/admin/properties/${property.id}`}
-                  className="block rounded-2xl border border-slate-200 p-5 transition hover:bg-slate-50"
+                  className="block cursor-pointer rounded-2xl border border-slate-200 p-5 transition hover:border-blue-300 hover:bg-blue-50/40"
                 >
                   <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                     <div>
                       <p className="text-lg font-black text-slate-900">
                         {property.name || "Unnamed Property"}
                       </p>
+
                       <p className="mt-1 text-sm text-slate-500">
-                        {property.address_line_1 || "No address"}{" "}
-                        {property.city ? `• ${property.city}, ${property.state}` : ""}
+                        {property.address_line_1 || "No address"}
+                        {property.city
+                          ? ` • ${property.city}, ${property.state || ""}`
+                          : ""}
+                      </p>
+
+                      <p className="mt-2 text-xs font-semibold text-blue-600">
+                        Click to manage property →
                       </p>
                     </div>
 
@@ -93,9 +102,11 @@ export default async function AdminPropertiesPage() {
                       <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold capitalize text-slate-700">
                         {property.property_status || "pending"}
                       </span>
+
                       <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
                         {property.number_of_units ?? 0} units
                       </span>
+
                       <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
                         {property.number_of_buildings ?? 0} buildings
                       </span>
