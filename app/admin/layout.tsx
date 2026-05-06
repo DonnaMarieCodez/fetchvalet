@@ -1,77 +1,58 @@
 import Link from "next/link";
+import { createClient } from "@/src/lib/supabase/server";
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let isAdmin = false;
+
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role, status")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    isAdmin = profile?.role === "admin" && profile?.status === "approved";
+  }
+
+  // No admin nav until logged in as approved admin
+  if (!isAdmin) {
+    return <>{children}</>;
+  }
+
   return (
     <div className="min-h-screen bg-slate-100">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-8 py-4">
+      <header className="border-b bg-white">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <div>
-            <Link
-              href="/admin"
-              className="text-xl font-bold text-slate-900"
-            >
-              FetchValet Admin
-            </Link>
+            <p className="text-xl font-black text-slate-900">FetchValet Admin</p>
             <p className="text-sm text-slate-500">
               Manage workers, properties, routes, payouts, and complaints
             </p>
           </div>
 
-          <nav className="flex flex-wrap items-center gap-2">
-            <Link
-              href="/admin"
-              className="rounded-xl px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-            >
-              Dashboard
-            </Link>
-
-            <Link
-              href="/admin/workers"
-              className="rounded-xl px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-            >
-              Workers
-            </Link>
-<Link
-  href="/admin/routes"
-  className="rounded-xl px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
->
-  Routes
-</Link>
-            <Link
-              href="/admin/properties"
-              className="rounded-xl px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-            >
-              Properties
-            </Link>
-
-            <Link
-              href="/admin/complaints"
-              className="rounded-xl px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-            >
-              Complaints
-            </Link>
-
-            <Link
-              href="/admin/payouts"
-              className="rounded-xl px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-            >
-              Payouts
-            </Link>
-            <Link
-  href="/admin/accounting"
-  className="rounded-xl px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
->
-  Accounting
-</Link>
+          <nav className="flex items-center gap-6 text-sm font-semibold text-slate-700">
+            <Link href="/admin">Dashboard</Link>
+            <Link href="/admin/workers">Workers</Link>
+            <Link href="/admin/routes">Routes</Link>
+            <Link href="/admin/properties">Properties</Link>
+            <Link href="/admin/complaints">Complaints</Link>
+            <Link href="/admin/payouts">Payouts</Link>
+            <Link href="/admin/accounting">Accounting</Link>
           </nav>
         </div>
       </header>
 
-      <div className="mx-auto max-w-7xl px-8 py-8">{children}</div>
+      {children}
     </div>
   );
 }
