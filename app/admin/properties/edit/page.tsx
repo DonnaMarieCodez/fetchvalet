@@ -5,6 +5,7 @@ import { updateProperty } from "../actions/update-property";
 import {
   createBuilding,
   createUnits,
+  generateUnits,
 } from "../actions/building-unit-actions";
 
 type PageProps = {
@@ -178,26 +179,40 @@ export default async function PropertySetupPage({ searchParams }: PageProps) {
                       </p>
                     </div>
 
-                    <form action={createUnits} className="mt-4 space-y-3">
+                    <form action={generateUnits} className="mt-4 grid gap-3 md:grid-cols-4">
   <input type="hidden" name="propertyId" value={id} />
   <input type="hidden" name="buildingId" value={building.id} />
 
-  <textarea
-    name="units"
-    rows={3}
-    placeholder="Enter units separated by commas, ex: 101, 102, 103, 104"
-    className="w-full rounded-2xl border border-slate-300 px-4 py-3"
+  <input
+    name="startFloor"
+    type="number"
+    min="1"
+    defaultValue="1"
+    placeholder="Start floor"
+    className="rounded-2xl border border-slate-300 px-4 py-3"
     required
   />
 
   <input
-    name="floor"
-    placeholder="Optional floor, ex: 1"
-    className="w-full rounded-2xl border border-slate-300 px-4 py-3"
+    name="floorCount"
+    type="number"
+    min="1"
+    placeholder="# of floors"
+    className="rounded-2xl border border-slate-300 px-4 py-3"
+    required
+  />
+
+  <input
+    name="unitsPerFloor"
+    type="number"
+    min="1"
+    placeholder="Units per floor"
+    className="rounded-2xl border border-slate-300 px-4 py-3"
+    required
   />
 
   <button className="rounded-2xl bg-slate-950 px-5 py-3 font-bold text-white">
-    Add Units
+    Generate Units
   </button>
 </form>
                   </div>
