@@ -1,16 +1,21 @@
 import Link from "next/link";
 import { requireAdmin } from "@/src/lib/auth/require-admin";
 import { createAdminClient } from "@/src/lib/supabase/admin";
-import { updateProperty } from "../../actions/update-property";
+import { updateProperty } from "../actions/update-property";
 
 type PageProps = {
-  params: Promise<{ id: string }>;
+  searchParams: Promise<{ id?: string }>;
 };
 
-export default async function EditPropertyPage({ params }: PageProps) {
+export default async function EditPropertyPage({ searchParams }: PageProps) {
   await requireAdmin();
 
-  const { id } = await params;
+  const { id } = await searchParams;
+
+  if (!id) {
+    return <ErrorBox message="Missing property ID." />;
+  }
+
   const supabase = createAdminClient();
 
   const { data: property, error } = await supabase
@@ -21,26 +26,9 @@ export default async function EditPropertyPage({ params }: PageProps) {
 
   if (error || !property) {
     return (
-      <main className="mx-auto max-w-3xl p-8">
-        <div className="rounded-3xl border border-red-200 bg-red-50 p-6 text-red-700">
-          <h1 className="text-2xl font-black">Edit property failed to load</h1>
-
-          <p className="mt-3">
-            <strong>Property ID:</strong> {id || "Missing ID"}
-          </p>
-
-          <pre className="mt-4 whitespace-pre-wrap rounded-2xl bg-white p-4 text-sm">
-            {error?.message || "No property was found for this ID."}
-          </pre>
-
-          <Link
-            href="/admin/properties"
-            className="mt-6 inline-block rounded-2xl bg-red-700 px-5 py-3 font-bold text-white"
-          >
-            Back to Properties
-          </Link>
-        </div>
-      </main>
+      <ErrorBox
+        message={error?.message || "No property was found for this ID."}
+      />
     );
   }
 
@@ -50,14 +38,9 @@ export default async function EditPropertyPage({ params }: PageProps) {
         <p className="text-sm uppercase tracking-[0.25em] text-slate-300">
           Edit Property
         </p>
-
         <h1 className="mt-3 text-4xl font-black">
           {property.name || "Unnamed Property"}
         </h1>
-
-        <p className="mt-3 text-slate-200">
-          Update property details, service schedule, pricing, and route settings.
-        </p>
       </section>
 
       <form
@@ -67,48 +50,17 @@ export default async function EditPropertyPage({ params }: PageProps) {
         <input type="hidden" name="propertyId" value={id} />
 
         <div className="grid gap-5 md:grid-cols-2">
-          <Input
-            name="name"
-            label="Property Name"
-            defaultValue={property.name}
-            required
-          />
-
-          <Input
-            name="addressLine1"
-            label="Address Line 1"
-            defaultValue={property.address_line_1}
-            required
-          />
-
-          <Input
-            name="city"
-            label="City"
-            defaultValue={property.city}
-            required
-          />
-
-          <Input
-            name="state"
-            label="State"
-            defaultValue={property.state}
-            required
-          />
-
-          <Input
-            name="zipCode"
-            label="ZIP Code"
-            defaultValue={property.zip_code}
-          />
+          <Input name="name" label="Property Name" defaultValue={property.name} required />
+          <Input name="addressLine1" label="Address Line 1" defaultValue={property.address_line_1} required />
+          <Input name="city" label="City" defaultValue={property.city} required />
+          <Input name="state" label="State" defaultValue={property.state} required />
+          <Input name="zipCode" label="ZIP Code" defaultValue={property.zip_code} />
 
           <Input
             name="pickupStartTime"
             label="Pickup Start Time"
             type="time"
-            defaultValue={String(property.pickup_start_time || "20:00").slice(
-              0,
-              5
-            )}
+            defaultValue={String(property.pickup_start_time || "20:00").slice(0, 5)}
             required
           />
 
@@ -143,11 +95,8 @@ export default async function EditPropertyPage({ params }: PageProps) {
           />
         </div>
 
-        <div className="mt-8 flex flex-wrap gap-3 border-t pt-8">
-          <button
-            type="submit"
-            className="rounded-2xl bg-slate-950 px-6 py-3 font-bold text-white"
-          >
+        <div className="mt-8 flex gap-3 border-t pt-8">
+          <button className="rounded-2xl bg-slate-950 px-6 py-3 font-bold text-white">
             Save Changes
           </button>
 
@@ -181,15 +130,31 @@ function Input({
   return (
     <div>
       <label className="text-sm font-medium text-slate-700">{label}</label>
-
       <input
         name={name}
         type={type}
         step={step}
         defaultValue={defaultValue ?? ""}
         required={required}
-        className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-slate-900"
+        className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3"
       />
     </div>
+  );
+}
+
+function ErrorBox({ message }: { message: string }) {
+  return (
+    <main className="mx-auto max-w-3xl p-8">
+      <div className="rounded-3xl border border-red-200 bg-red-50 p-6 text-red-700">
+        <h1 className="text-2xl font-black">Edit property failed to load</h1>
+        <p className="mt-3">{message}</p>
+        <Link
+          href="/admin/properties"
+          className="mt-6 inline-block rounded-2xl bg-red-700 px-5 py-3 font-bold text-white"
+        >
+          Back to Properties
+        </Link>
+      </div>
+    </main>
   );
 }

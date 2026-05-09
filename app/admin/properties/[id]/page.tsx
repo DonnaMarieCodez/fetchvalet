@@ -50,11 +50,11 @@ export default async function PropertyDetailPage({ params }: PageProps) {
 
           <div className="flex flex-wrap gap-3">
             <Link
-              href={`/admin/properties/${id}/edit`}
-              className="rounded-2xl bg-white px-5 py-3 text-sm font-bold text-slate-900"
-            >
-              Edit Property
-            </Link>
+  href={`/admin/properties/edit?id=${property.id}`}
+  className="rounded-2xl bg-white px-5 py-3 text-sm font-bold text-slate-900"
+>
+  Edit Property
+</Link>
 
             <Link
               href="/admin/properties"
