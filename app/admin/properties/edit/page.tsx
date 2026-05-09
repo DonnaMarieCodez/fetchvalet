@@ -2,7 +2,10 @@ import Link from "next/link";
 import { requireAdmin } from "@/src/lib/auth/require-admin";
 import { createAdminClient } from "@/src/lib/supabase/admin";
 import { updateProperty } from "../actions/update-property";
-import { addBuilding, addUnit } from "../actions/building-unit-actions";
+import {
+  createBuilding,
+  createUnits,
+} from "../actions/building-unit-actions";
 
 type PageProps = {
   searchParams: Promise<{ id?: string }>;
@@ -88,7 +91,7 @@ export default async function PropertySetupPage({ searchParams }: PageProps) {
         </h2>
 
         <div className="mt-6 grid gap-5 md:grid-cols-2">
-          <Input name="name" label="Property Name" defaultValue={property.name} required />
+          <Input name="units" label="Property Name" defaultValue={property.name} required />
           <Input name="addressLine1" label="Address Line 1" defaultValue={property.address_line_1} required />
           <Input name="city" label="City" defaultValue={property.city} required />
           <Input name="state" label="State" defaultValue={property.state} required />
@@ -135,7 +138,7 @@ export default async function PropertySetupPage({ searchParams }: PageProps) {
           Buildings & Units
         </h2>
 
-        <form action={addBuilding} className="mt-6 flex flex-col gap-3 md:flex-row">
+        <form action={createBuilding} className="mt-6 flex flex-col gap-3 md:flex-row">
           <input type="hidden" name="propertyId" value={id} />
           <input
             name="buildingName"
@@ -174,7 +177,7 @@ export default async function PropertySetupPage({ searchParams }: PageProps) {
                       </p>
                     </div>
 
-                    <form action={addUnit} className="flex flex-col gap-2 md:flex-row">
+                    <form action={createUnits} className="flex flex-col gap-2 md:flex-row">
                       <input type="hidden" name="propertyId" value={id} />
                       <input type="hidden" name="buildingId" value={building.id} />
 
