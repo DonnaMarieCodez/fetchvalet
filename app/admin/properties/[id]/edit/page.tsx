@@ -4,13 +4,13 @@ import { createAdminClient } from "@/src/lib/supabase/admin";
 import { updateProperty } from "../../actions/update-property";
 
 type PageProps = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export default async function EditPropertyPage({ params }: PageProps) {
   await requireAdmin();
 
-  const { id } = params;
+  const { id } = await params;
   const supabase = createAdminClient();
 
   const { data: property, error } = await supabase
@@ -24,9 +24,11 @@ export default async function EditPropertyPage({ params }: PageProps) {
       <main className="mx-auto max-w-3xl p-8">
         <div className="rounded-3xl border border-red-200 bg-red-50 p-6 text-red-700">
           <h1 className="text-2xl font-black">Edit property failed to load</h1>
+
           <p className="mt-3">
-            <strong>Property ID:</strong> {id}
+            <strong>Property ID:</strong> {id || "Missing ID"}
           </p>
+
           <pre className="mt-4 whitespace-pre-wrap rounded-2xl bg-white p-4 text-sm">
             {error?.message || "No property was found for this ID."}
           </pre>
@@ -48,9 +50,11 @@ export default async function EditPropertyPage({ params }: PageProps) {
         <p className="text-sm uppercase tracking-[0.25em] text-slate-300">
           Edit Property
         </p>
+
         <h1 className="mt-3 text-4xl font-black">
           {property.name || "Unnamed Property"}
         </h1>
+
         <p className="mt-3 text-slate-200">
           Update property details, service schedule, pricing, and route settings.
         </p>
@@ -63,18 +67,51 @@ export default async function EditPropertyPage({ params }: PageProps) {
         <input type="hidden" name="propertyId" value={id} />
 
         <div className="grid gap-5 md:grid-cols-2">
-          <Input name="name" label="Property Name" defaultValue={property.name} required />
-          <Input name="addressLine1" label="Address Line 1" defaultValue={property.address_line_1} required />
-          <Input name="city" label="City" defaultValue={property.city} required />
-          <Input name="state" label="State" defaultValue={property.state} required />
-          <Input name="zipCode" label="ZIP Code" defaultValue={property.zip_code} />
+          <Input
+            name="name"
+            label="Property Name"
+            defaultValue={property.name}
+            required
+          />
+
+          <Input
+            name="addressLine1"
+            label="Address Line 1"
+            defaultValue={property.address_line_1}
+            required
+          />
+
+          <Input
+            name="city"
+            label="City"
+            defaultValue={property.city}
+            required
+          />
+
+          <Input
+            name="state"
+            label="State"
+            defaultValue={property.state}
+            required
+          />
+
+          <Input
+            name="zipCode"
+            label="ZIP Code"
+            defaultValue={property.zip_code}
+          />
+
           <Input
             name="pickupStartTime"
             label="Pickup Start Time"
             type="time"
-            defaultValue={String(property.pickup_start_time || "20:00").slice(0, 5)}
+            defaultValue={String(property.pickup_start_time || "20:00").slice(
+              0,
+              5
+            )}
             required
           />
+
           <Input
             name="monthlyBillingDollars"
             label="Monthly Billing ($)"
@@ -82,6 +119,7 @@ export default async function EditPropertyPage({ params }: PageProps) {
             step="0.01"
             defaultValue={(property.monthly_billing_cents ?? 0) / 100}
           />
+
           <Input
             name="defaultRoutePayoutDollars"
             label="Route Payout ($)"
@@ -89,12 +127,14 @@ export default async function EditPropertyPage({ params }: PageProps) {
             step="0.01"
             defaultValue={(property.default_route_payout_cents ?? 0) / 100}
           />
+
           <Input
             name="defaultMinimumWorkerScore"
             label="Minimum Worker Score"
             type="number"
             defaultValue={property.default_minimum_worker_score ?? 0}
           />
+
           <Input
             name="maxUnitsPerRoute"
             label="Max Units Per Route"
@@ -141,6 +181,7 @@ function Input({
   return (
     <div>
       <label className="text-sm font-medium text-slate-700">{label}</label>
+
       <input
         name={name}
         type={type}
