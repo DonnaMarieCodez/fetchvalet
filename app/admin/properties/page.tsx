@@ -77,7 +77,7 @@ export default async function AdminPropertiesPage() {
               {propertyList.map((property) => (
                 <Link
                   key={property.id}
-                  href={`/admin/properties/${property.id}`}
+                  href={`/admin/properties/edit?id=${property.id}`}
                   className="block cursor-pointer rounded-2xl border border-slate-200 p-5 transition hover:border-blue-300 hover:bg-blue-50/40"
                 >
                   <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
