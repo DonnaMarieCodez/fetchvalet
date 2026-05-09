@@ -139,13 +139,14 @@ export default async function PropertySetupPage({ searchParams }: PageProps) {
         </h2>
 
         <form action={createBuilding} className="mt-6 flex flex-col gap-3 md:flex-row">
-          <input type="hidden" name="propertyId" value={id} />
-          <input
-            name="buildingName"
-            placeholder="Building name, ex: Building A"
-            className="w-full rounded-2xl border border-slate-300 px-4 py-3"
-            required
-          />
+         <input type="hidden" name="propertyId" value={id} />
+
+<input
+  name="name"
+  placeholder="Building name, ex: Building A"
+  className="w-full rounded-2xl border border-slate-300 px-4 py-3"
+  required
+/>
           <button className="rounded-2xl bg-blue-600 px-6 py-3 font-bold text-white">
             Add Building
           </button>

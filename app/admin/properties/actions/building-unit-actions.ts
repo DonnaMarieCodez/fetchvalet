@@ -53,7 +53,11 @@ export async function createBuilding(formData: FormData) {
   const supabase = createAdminClient();
 
   const propertyId = String(formData.get("propertyId") || "").trim();
-  const name = String(formData.get("name") || "").trim();
+
+  // accepts either name or buildingName so it will not crash
+  const name = String(
+    formData.get("name") || formData.get("buildingName") || ""
+  ).trim();
 
   if (!propertyId || !name) {
     throw new Error("Property and building name are required.");
