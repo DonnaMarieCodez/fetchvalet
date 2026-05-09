@@ -1,7 +1,53 @@
 "use server";
 
-import { createAdminClient } from "@/src/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
+import { createAdminClient } from "@/src/lib/supabase/admin";
+
+function propertySetupPath(propertyId: string) {
+  return `/admin/properties/edit?id=${propertyId}`;
+}
+
+async function refreshPropertyCounts(propertyId: string) {
+  const supabase = createAdminClient();
+
+  const { count: buildingCount } = await supabase
+    .from("buildings")
+    .select("*", { count: "exact", head: true })
+    .eq("property_id", propertyId);
+
+  const { data: buildings } = await supabase
+    .from("buildings")
+    .select("id")
+    .eq("property_id", propertyId);
+
+  const buildingIds = (buildings ?? []).map((building) => building.id);
+
+  let unitCount = 0;
+
+  if (buildingIds.length > 0) {
+    const { count } = await supabase
+      .from("units")
+      .select("*", { count: "exact", head: true })
+      .in("building_id", buildingIds);
+
+    unitCount = count ?? 0;
+  }
+
+  await supabase
+    .from("properties")
+    .update({
+      number_of_buildings: buildingCount ?? 0,
+      number_of_units: unitCount,
+    })
+    .eq("id", propertyId);
+}
+
+async function refresh(propertyId: string) {
+  await refreshPropertyCounts(propertyId);
+  revalidatePath("/admin/properties");
+  revalidatePath("/admin/properties/edit");
+  revalidatePath(propertySetupPath(propertyId));
+}
 
 export async function createBuilding(formData: FormData) {
   const supabase = createAdminClient();
@@ -22,7 +68,7 @@ export async function createBuilding(formData: FormData) {
     throw new Error(error.message);
   }
 
-  revalidatePath(`/admin/properties/${propertyId}`);
+  await refresh(propertyId);
 }
 
 export async function updateBuilding(formData: FormData) {
@@ -45,7 +91,7 @@ export async function updateBuilding(formData: FormData) {
     throw new Error(error.message);
   }
 
-  revalidatePath(`/admin/properties/${propertyId}`);
+  await refresh(propertyId);
 }
 
 export async function deleteBuilding(formData: FormData) {
@@ -76,7 +122,7 @@ export async function deleteBuilding(formData: FormData) {
     throw new Error(buildingDeleteError.message);
   }
 
-  revalidatePath(`/admin/properties/${propertyId}`);
+  await refresh(propertyId);
 }
 
 export async function createUnits(formData: FormData) {
@@ -112,7 +158,7 @@ export async function createUnits(formData: FormData) {
     throw new Error(error.message);
   }
 
-  revalidatePath(`/admin/properties/${propertyId}`);
+  await refresh(propertyId);
 }
 
 export async function generateUnits(formData: FormData) {
@@ -167,7 +213,7 @@ export async function generateUnits(formData: FormData) {
     throw new Error(error.message);
   }
 
-  revalidatePath(`/admin/properties/${propertyId}`);
+  await refresh(propertyId);
 }
 
 export async function deleteUnit(formData: FormData) {
@@ -186,7 +232,7 @@ export async function deleteUnit(formData: FormData) {
     throw new Error(error.message);
   }
 
-  revalidatePath(`/admin/properties/${propertyId}`);
+  await refresh(propertyId);
 }
 
 export async function updatePropertyStatus(formData: FormData) {
@@ -212,6 +258,5 @@ export async function updatePropertyStatus(formData: FormData) {
     throw new Error(error.message);
   }
 
-  revalidatePath(`/admin/properties/${propertyId}`);
-  revalidatePath("/admin/properties");
+  await refresh(propertyId);
 }
