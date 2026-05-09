@@ -178,27 +178,28 @@ export default async function PropertySetupPage({ searchParams }: PageProps) {
                       </p>
                     </div>
 
-                    <form action={createUnits} className="flex flex-col gap-2 md:flex-row">
-                      <input type="hidden" name="propertyId" value={id} />
-                      <input type="hidden" name="buildingId" value={building.id} />
+                    <form action={createUnits} className="mt-4 space-y-3">
+  <input type="hidden" name="propertyId" value={id} />
+  <input type="hidden" name="buildingId" value={building.id} />
 
-                      <input
-                        name="unitNumber"
-                        placeholder="Unit #"
-                        className="rounded-xl border border-slate-300 px-3 py-2"
-                        required
-                      />
+  <textarea
+    name="units"
+    rows={3}
+    placeholder="Enter units separated by commas, ex: 101, 102, 103, 104"
+    className="w-full rounded-2xl border border-slate-300 px-4 py-3"
+    required
+  />
 
-                      <input
-                        name="floor"
-                        placeholder="Floor"
-                        className="rounded-xl border border-slate-300 px-3 py-2"
-                      />
+  <input
+    name="floor"
+    placeholder="Optional floor, ex: 1"
+    className="w-full rounded-2xl border border-slate-300 px-4 py-3"
+  />
 
-                      <button className="rounded-xl bg-slate-950 px-4 py-2 font-bold text-white">
-                        Add Unit
-                      </button>
-                    </form>
+  <button className="rounded-2xl bg-slate-950 px-5 py-3 font-bold text-white">
+    Add Units
+  </button>
+</form>
                   </div>
 
                   <div className="mt-4 grid gap-2 md:grid-cols-4">
