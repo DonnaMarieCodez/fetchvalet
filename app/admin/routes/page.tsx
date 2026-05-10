@@ -1,4 +1,4 @@
-import { createClient } from "@/src/lib/supabase/server";
+import { createAdminClient } from "@/src/lib/supabase/admin";
 import { createRoute } from "./actions/create-route";
 import { deleteRoute } from "./actions/route-actions";
 import DeleteRouteButton from "./DeleteRouteButton";
@@ -59,7 +59,7 @@ function getStatusBadge(status: string | null) {
 }
 
 export default async function AdminRoutesPage() {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const [
     { data: properties, error: propertiesError },
