@@ -1,4 +1,3 @@
-import { requireAdmin } from "@/src/lib/auth/require-admin";
 import { createClient } from "@/src/lib/supabase/server";
 import { createRoute } from "./actions/create-route";
 import { deleteRoute } from "./actions/route-actions";
@@ -12,15 +11,13 @@ type PropertyRecord = {
 
 type RouteRecord = {
   id: string;
+  property_id: string | null;
   route_date: string | null;
   start_time: string | null;
   end_time: string | null;
   status: string | null;
   payout_cents: number | null;
   minimum_worker_score: number | null;
-  properties: {
-    name: string;
-  } | null;
 };
 
 function formatMoney(cents: number | null) {
@@ -61,34 +58,6 @@ function getStatusBadge(status: string | null) {
   }
 }
 
-function normalizeProperty(value: unknown): { name: string } | null {
-  if (!value) return null;
-
-  if (Array.isArray(value)) {
-    const first = value[0];
-    if (
-      first &&
-      typeof first === "object" &&
-      "name" in first &&
-      typeof (first as { name?: unknown }).name === "string"
-    ) {
-      return { name: (first as { name: string }).name };
-    }
-    return null;
-  }
-
-  if (
-    typeof value === "object" &&
-    value !== null &&
-    "name" in value &&
-    typeof (value as { name?: unknown }).name === "string"
-  ) {
-    return { name: (value as { name: string }).name };
-  }
-
-  return null;
-}
-
 export default async function AdminRoutesPage() {
   const supabase = await createClient();
 
@@ -101,52 +70,21 @@ export default async function AdminRoutesPage() {
       .select("id, name")
       .eq("property_status", "active")
       .order("name", { ascending: true }),
+
     supabase
       .from("routes")
-      .select(`
-        id,
-        route_date,
-        start_time,
-        end_time,
-        status,
-        payout_cents,
-        minimum_worker_score,
-        properties (
-          name
-        )
-      `)
+      .select(
+        "id, property_id, route_date, start_time, end_time, status, payout_cents, minimum_worker_score"
+      )
       .order("route_date", { ascending: false }),
   ]);
 
-  const typedProperties: PropertyRecord[] = (properties ?? []).map((row) => {
-    const record = row as Record<string, unknown>;
+  const typedProperties = (properties ?? []) as PropertyRecord[];
+  const typedRoutes = (routes ?? []) as RouteRecord[];
 
-    return {
-      id: String(record.id ?? ""),
-      name: typeof record.name === "string" ? record.name : "Unknown Property",
-    };
-  });
-
-  const typedRoutes: RouteRecord[] = (routes ?? []).map((row) => {
-    const record = row as Record<string, unknown>;
-
-    return {
-      id: String(record.id ?? ""),
-      route_date:
-        typeof record.route_date === "string" ? record.route_date : null,
-      start_time:
-        typeof record.start_time === "string" ? record.start_time : null,
-      end_time: typeof record.end_time === "string" ? record.end_time : null,
-      status: typeof record.status === "string" ? record.status : null,
-      payout_cents:
-        typeof record.payout_cents === "number" ? record.payout_cents : 0,
-      minimum_worker_score:
-        typeof record.minimum_worker_score === "number"
-          ? record.minimum_worker_score
-          : 0,
-      properties: normalizeProperty(record.properties),
-    };
-  });
+  const propertyNameById = new Map(
+    typedProperties.map((property) => [property.id, property.name])
+  );
 
   return (
     <main className="min-h-screen bg-slate-100 p-8">
@@ -209,59 +147,25 @@ export default async function AdminRoutesPage() {
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700">
-                    Start Time
-                  </label>
-                  <input
-                    name="startTime"
-                    type="time"
-                    required
-                    className="mt-1 w-full rounded-2xl border px-3 py-2"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700">
-                    End Time
-                  </label>
-                  <input
-                    name="endTime"
-                    type="time"
-                    required
-                    className="mt-1 w-full rounded-2xl border px-3 py-2"
-                  />
-                </div>
+                <Input name="startTime" label="Start Time" type="time" />
+                <Input name="endTime" label="End Time" type="time" />
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700">
-                    Payout ($)
-                  </label>
-                  <input
-                    name="payoutDollars"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    required
-                    className="mt-1 w-full rounded-2xl border px-3 py-2"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700">
-                    Minimum Worker Score
-                  </label>
-                  <input
-                    name="minimumWorkerScore"
-                    type="number"
-                    min="0"
-                    defaultValue={0}
-                    required
-                    className="mt-1 w-full rounded-2xl border px-3 py-2"
-                  />
-                </div>
+                <Input
+                  name="payoutDollars"
+                  label="Payout ($)"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                />
+                <Input
+                  name="minimumWorkerScore"
+                  label="Minimum Worker Score"
+                  type="number"
+                  min="0"
+                  defaultValue={0}
+                />
               </div>
 
               <button
@@ -309,15 +213,21 @@ export default async function AdminRoutesPage() {
                   <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                     <div>
                       <p className="text-xl font-bold text-slate-900">
-                        {route.properties?.name || "Unknown Property"}
+                        {route.property_id
+                          ? propertyNameById.get(route.property_id) ||
+                            "Unknown Property"
+                          : "Unknown Property"}
                       </p>
+
                       <p className="mt-2 text-sm text-slate-600">
                         Date: {route.route_date || "Not set"}
                       </p>
+
                       <p className="mt-1 text-sm text-slate-600">
                         Time: {formatTime(route.start_time)} -{" "}
                         {formatTime(route.end_time)}
                       </p>
+
                       <p className="mt-1 text-sm text-slate-600">
                         Minimum Score: {route.minimum_worker_score ?? 0}
                       </p>
@@ -349,5 +259,36 @@ export default async function AdminRoutesPage() {
         </section>
       </div>
     </main>
+  );
+}
+
+function Input({
+  name,
+  label,
+  type,
+  step,
+  min,
+  defaultValue,
+}: {
+  name: string;
+  label: string;
+  type: string;
+  step?: string;
+  min?: string;
+  defaultValue?: string | number;
+}) {
+  return (
+    <div>
+      <label className="block text-sm font-medium text-slate-700">{label}</label>
+      <input
+        name={name}
+        type={type}
+        step={step}
+        min={min}
+        defaultValue={defaultValue}
+        required
+        className="mt-1 w-full rounded-2xl border px-3 py-2"
+      />
+    </div>
   );
 }
