@@ -1,11 +1,14 @@
 import Link from "next/link";
 import { requireAdmin } from "@/src/lib/auth/require-admin";
 import { createAdminClient } from "@/src/lib/supabase/admin";
+
 import { updateProperty } from "../actions/update-property";
+
 import {
   createBuilding,
-  createUnits,
   generateUnits,
+  deleteBuilding,
+  deleteUnit,
 } from "../actions/building-unit-actions";
 
 type PageProps = {
@@ -25,7 +28,9 @@ type Unit = {
   active: boolean | null;
 };
 
-export default async function PropertySetupPage({ searchParams }: PageProps) {
+export default async function PropertySetupPage({
+  searchParams,
+}: PageProps) {
   await requireAdmin();
 
   const { id } = await searchParams;
@@ -50,10 +55,11 @@ export default async function PropertySetupPage({ searchParams }: PageProps) {
     .from("buildings")
     .select("id, name")
     .eq("property_id", id)
-    .order("name", { ascending: true });
+    .order("name");
 
   const typedBuildings = (buildings ?? []) as Building[];
-  const buildingIds = typedBuildings.map((building) => building.id);
+
+  const buildingIds = typedBuildings.map((b) => b.id);
 
   let units: Unit[] = [];
 
@@ -62,25 +68,29 @@ export default async function PropertySetupPage({ searchParams }: PageProps) {
       .from("units")
       .select("id, unit_number, floor, building_id, active")
       .in("building_id", buildingIds)
-      .order("unit_number", { ascending: true });
+      .order("unit_number");
 
     units = (unitData ?? []) as Unit[];
   }
 
   return (
     <main className="mx-auto max-w-6xl space-y-8 p-6">
+      {/* HEADER */}
       <section className="rounded-3xl bg-gradient-to-r from-slate-900 to-slate-700 p-8 text-white shadow-lg">
         <p className="text-sm uppercase tracking-[0.25em] text-slate-300">
           Property Setup
         </p>
+
         <h1 className="mt-3 text-4xl font-black">
           {property.name || "Unnamed Property"}
         </h1>
+
         <p className="mt-3 text-slate-200">
-          Add buildings and units so routes can be generated correctly.
+          Add buildings and units so routes can auto-generate correctly.
         </p>
       </section>
 
+      {/* PROPERTY FORM */}
       <form
         action={updateProperty}
         className="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200"
@@ -92,18 +102,50 @@ export default async function PropertySetupPage({ searchParams }: PageProps) {
         </h2>
 
         <div className="mt-6 grid gap-5 md:grid-cols-2">
-          <Input name="units" label="Property Name" defaultValue={property.name} required />
-          <Input name="addressLine1" label="Address Line 1" defaultValue={property.address_line_1} required />
-          <Input name="city" label="City" defaultValue={property.city} required />
-          <Input name="state" label="State" defaultValue={property.state} required />
-          <Input name="zipCode" label="ZIP Code" defaultValue={property.zip_code} />
+          <Input
+            name="name"
+            label="Property Name"
+            defaultValue={property.name}
+            required
+          />
+
+          <Input
+            name="addressLine1"
+            label="Address Line 1"
+            defaultValue={property.address_line_1}
+            required
+          />
+
+          <Input
+            name="city"
+            label="City"
+            defaultValue={property.city}
+            required
+          />
+
+          <Input
+            name="state"
+            label="State"
+            defaultValue={property.state}
+            required
+          />
+
+          <Input
+            name="zipCode"
+            label="ZIP Code"
+            defaultValue={property.zip_code}
+          />
+
           <Input
             name="pickupStartTime"
             label="Pickup Start Time"
             type="time"
-            defaultValue={String(property.pickup_start_time || "20:00").slice(0, 5)}
+            defaultValue={String(
+              property.pickup_start_time || "20:00"
+            ).slice(0, 5)}
             required
           />
+
           <Input
             name="monthlyBillingDollars"
             label="Monthly Billing ($)"
@@ -111,6 +153,7 @@ export default async function PropertySetupPage({ searchParams }: PageProps) {
             step="0.01"
             defaultValue={(property.monthly_billing_cents ?? 0) / 100}
           />
+
           <Input
             name="defaultRoutePayoutDollars"
             label="Route Payout ($)"
@@ -134,25 +177,32 @@ export default async function PropertySetupPage({ searchParams }: PageProps) {
         </div>
       </form>
 
+      {/* BUILDINGS */}
       <section className="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
         <h2 className="text-2xl font-black text-slate-900">
           Buildings & Units
         </h2>
 
-        <form action={createBuilding} className="mt-6 flex flex-col gap-3 md:flex-row">
-         <input type="hidden" name="propertyId" value={id} />
+        {/* ADD BUILDING */}
+        <form
+          action={createBuilding}
+          className="mt-6 flex flex-col gap-3 md:flex-row"
+        >
+          <input type="hidden" name="propertyId" value={id} />
 
-<input
-  name="name"
-  placeholder="Building name, ex: Building A"
-  className="w-full rounded-2xl border border-slate-300 px-4 py-3"
-  required
-/>
+          <input
+            name="name"
+            placeholder="Building name, ex: Building A"
+            className="w-full rounded-2xl border border-slate-300 px-4 py-3"
+            required
+          />
+
           <button className="rounded-2xl bg-blue-600 px-6 py-3 font-bold text-white">
             Add Building
           </button>
         </form>
 
+        {/* BUILDING LIST */}
         <div className="mt-8 space-y-5">
           {typedBuildings.length === 0 ? (
             <p className="rounded-2xl bg-slate-50 p-5 text-slate-600">
@@ -169,65 +219,134 @@ export default async function PropertySetupPage({ searchParams }: PageProps) {
                   key={building.id}
                   className="rounded-3xl border border-slate-200 p-5"
                 >
-                  <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                    <div>
-                      <h3 className="text-xl font-black text-slate-900">
-                        {building.name}
-                      </h3>
-                      <p className="text-sm text-slate-500">
-                        {buildingUnits.length} units
-                      </p>
+                  {/* TOP */}
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-xl font-black text-slate-900">
+                          {building.name}
+                        </h3>
+
+                        <p className="text-sm text-slate-500">
+                          {buildingUnits.length} units
+                        </p>
+                      </div>
+
+                      <form action={deleteBuilding}>
+                        <input
+                          type="hidden"
+                          name="propertyId"
+                          value={id}
+                        />
+
+                        <input
+                          type="hidden"
+                          name="buildingId"
+                          value={building.id}
+                        />
+
+                        <button
+                          type="submit"
+                          className="rounded-xl bg-red-600 px-4 py-2 text-sm font-bold text-white"
+                        >
+                          Delete Building
+                        </button>
+                      </form>
                     </div>
 
-                    <form action={generateUnits} className="mt-4 grid gap-3 md:grid-cols-4">
-  <input type="hidden" name="propertyId" value={id} />
-  <input type="hidden" name="buildingId" value={building.id} />
+                    {/* GENERATOR */}
+                    <form
+                      action={generateUnits}
+                      className="grid gap-3 md:grid-cols-4"
+                    >
+                      <input
+                        type="hidden"
+                        name="propertyId"
+                        value={id}
+                      />
 
-  <input
-    name="startFloor"
-    type="number"
-    min="1"
-    defaultValue="1"
-    placeholder="Start floor"
-    className="rounded-2xl border border-slate-300 px-4 py-3"
-    required
-  />
+                      <input
+                        type="hidden"
+                        name="buildingId"
+                        value={building.id}
+                      />
 
-  <input
-    name="floorCount"
-    type="number"
-    min="1"
-    placeholder="# of floors"
-    className="rounded-2xl border border-slate-300 px-4 py-3"
-    required
-  />
+                      <input
+                        name="startFloor"
+                        type="number"
+                        min="1"
+                        defaultValue="1"
+                        placeholder="Start floor"
+                        className="rounded-2xl border border-slate-300 px-4 py-3"
+                        required
+                      />
 
-  <input
-    name="unitsPerFloor"
-    type="number"
-    min="1"
-    placeholder="Units per floor"
-    className="rounded-2xl border border-slate-300 px-4 py-3"
-    required
-  />
+                      <input
+                        name="floorCount"
+                        type="number"
+                        min="1"
+                        placeholder="# of floors"
+                        className="rounded-2xl border border-slate-300 px-4 py-3"
+                        required
+                      />
 
-  <button className="rounded-2xl bg-slate-950 px-5 py-3 font-bold text-white">
-    Generate Units
-  </button>
-</form>
+                      <input
+                        name="unitsPerFloor"
+                        type="number"
+                        min="1"
+                        placeholder="Units per floor"
+                        className="rounded-2xl border border-slate-300 px-4 py-3"
+                        required
+                      />
+
+                      <button className="rounded-2xl bg-slate-950 px-5 py-3 font-bold text-white">
+                        Generate Units
+                      </button>
+                    </form>
                   </div>
 
-                  <div className="mt-4 grid gap-2 md:grid-cols-4">
+                  {/* UNITS */}
+                  <div className="mt-5 grid gap-3 md:grid-cols-4">
                     {buildingUnits.length === 0 ? (
-                      <p className="text-sm text-slate-500">No units yet.</p>
+                      <p className="text-sm text-slate-500">
+                        No units yet.
+                      </p>
                     ) : (
                       buildingUnits.map((unit) => (
                         <div
                           key={unit.id}
-                          className="rounded-xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700"
+                          className="rounded-2xl bg-slate-50 p-4"
                         >
-                          Unit {unit.unit_number}
-                          {unit.floor ? ` • Floor ${unit.floor}` : ""}
+                          <p className="font-bold text-slate-900">
+                            Unit {unit.unit_number}
+                          </p>
+
+                          <p className="mt-1 text-sm text-slate-500">
+                            {unit.floor
+                              ? `Floor ${unit.floor}`
+                              : "No floor"}
+                          </p>
+
+                          <form action={deleteUnit} className="mt-3">
+                            <input
+                              type="hidden"
+                              name="propertyId"
+                              value={id}
+                            />
+
+                            <input
+                              type="hidden"
+                              name="unitId"
+                              value={unit.id}
+                            />
+
+                            <button
+                              type="submit"
+                              className="rounded-lg bg-red-50 px-3 py-1 text-xs font-bold text-red-700"
+                            >
+                              Delete
+                            </button>
+                          </form>
                         </div>
                       ))
                     )}
@@ -259,7 +378,10 @@ function Input({
 }) {
   return (
     <div>
-      <label className="text-sm font-medium text-slate-700">{label}</label>
+      <label className="text-sm font-medium text-slate-700">
+        {label}
+      </label>
+
       <input
         name={name}
         type={type}
@@ -276,8 +398,12 @@ function ErrorBox({ message }: { message: string }) {
   return (
     <main className="mx-auto max-w-3xl p-8">
       <div className="rounded-3xl border border-red-200 bg-red-50 p-6 text-red-700">
-        <h1 className="text-2xl font-black">Property setup failed to load</h1>
+        <h1 className="text-2xl font-black">
+          Property setup failed to load
+        </h1>
+
         <p className="mt-3">{message}</p>
+
         <Link
           href="/admin/properties"
           className="mt-6 inline-block rounded-2xl bg-red-700 px-5 py-3 font-bold text-white"
