@@ -18,6 +18,7 @@ export default function WorkerSignupPage() {
 
   async function handleSignup(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+
     setLoading(true);
     setErrorMsg("");
 
@@ -28,8 +29,8 @@ export default function WorkerSignupPage() {
       password,
       options: {
         data: {
-          full_name: fullName,
-          phone,
+          full_name: fullName.trim(),
+          phone: phone.trim(),
           role: "worker",
         },
       },
@@ -43,12 +44,15 @@ export default function WorkerSignupPage() {
 
     const { error: profileError } = await supabase.from("profiles").upsert({
       id: data.user.id,
-      full_name: fullName,
-      phone,
+      full_name: fullName.trim(),
+      phone: phone.trim(),
       email: cleanEmail,
       role: "worker",
-      status: "pending",
+      status: "waitlist",
       worker_score: 75,
+      background_check_status: "not_started",
+      stripe_onboarding_status: "not_started",
+      worker_onboarding_completed: false,
     });
 
     if (profileError) {
@@ -57,19 +61,23 @@ export default function WorkerSignupPage() {
       return;
     }
 
-    router.push("/worker/onboarding");
+    router.push("/worker/status");
   }
 
   return (
-    <main className="min-h-screen bg-slate-100 flex items-center justify-center px-4 py-10">
+    <main className="flex min-h-screen items-center justify-center bg-slate-100 px-4 py-10">
       <div className="w-full max-w-lg rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
-        <h1 className="text-3xl font-bold text-slate-900">
-          Worker Application
+        <p className="text-sm font-bold uppercase tracking-[0.25em] text-blue-600">
+          Worker Waitlist
+        </p>
+
+        <h1 className="mt-3 text-3xl font-black text-slate-900">
+          Apply to work with FetchValet
         </h1>
 
         <p className="mt-2 text-sm text-slate-600">
-          Apply to become a FetchValet worker. Your account will stay pending
-          until approved by an admin.
+          Submit your basic information first. If approved, you’ll complete
+          onboarding, background check consent, and payout setup.
         </p>
 
         {errorMsg && (
@@ -119,7 +127,7 @@ export default function WorkerSignupPage() {
             disabled={loading}
             className="w-full rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white disabled:opacity-60"
           >
-            {loading ? "Submitting..." : "Submit Application"}
+            {loading ? "Submitting..." : "Join Waitlist"}
           </button>
         </form>
 
