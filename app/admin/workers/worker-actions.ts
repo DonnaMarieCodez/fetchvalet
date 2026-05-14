@@ -26,7 +26,7 @@ async function updateWorkerStatus(workerId: string, nextStatus: string) {
 
 export async function approveWorker(formData: FormData) {
   const workerId = String(formData.get("workerId") || "");
-  await updateWorkerStatus(workerId, "approved");
+  await updateWorkerStatus(workerId, "onboarding");
 }
 
 export async function rejectWorker(formData: FormData) {
